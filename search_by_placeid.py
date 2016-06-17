@@ -6,10 +6,13 @@ import json
 def getPlaceID(city_name):
 
 	file_name = "place-id-" + city_name + ".txt"
-	if os.path.isfile(file_name) == False:
-		return ''
+	file_path = os.getcwd() + "/txt_files/" + file_name
+	#print file_path
+	if os.path.isfile(file_path) == False:
+		print "this file doesn't exist"
+		quit()
 
-	input = open(file_name, 'r')
+	input = open(file_path, 'r')
 	s = input.readline()
 
 	place_id_dict = {}
@@ -64,18 +67,36 @@ def main():
 #    num_results = 500
 	print "place name: ", 
 	city_name = raw_input()
+#open output file
+	argvs = sys.argv
+	if len(argvs) > 1:
+		lang = argvs[1]
+		file_name = "search-result-" + lang + "-"+ city_name + ".txt"
+	else:
+		file_name = "search-result-" + city_name + ".txt"
+	output = open(file_name, 'w')
 
 #get place id
 	place_id_dict = getPlaceID(city_name)
 	for place in place_id_dict.keys():
 		results = searchTweetByPlaceID(twitter_api, place)
 
+		place_name = place_id_dict[place]
+		place_info = "------- " + place_name[0] + " -------\n"
+		#output.write(place_info.decode('utf-8'))
+		output.write(place_info)
+
 		if len(results) > 0:
 			for result in results:
-				print json.dumps(result['text'], indent=1)
-#print json.dumps(results[0], indent=1)
+				#print json.dumps(result['text'], indent=1)
+				s = json.dumps(result['text'], indent=1) + "\n"#need to modify !!
+				#decode s as UTF-8 string
+				#output.write(s.decode('utf-8'))
+				output.write(s)
 		else:
 			print "no result from " + place[0] + place[1] 
+
+	output.close()
 
 if __name__ == "__main__":
 	main()
