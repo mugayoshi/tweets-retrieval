@@ -10,7 +10,6 @@ def extractLabels(input_file):
 	labels = []
 	data = []
 	for row in csv_reader:
-		labels.append(row[0])
 		data.append(row[5])
 		if row[0] == "4":
 			labels.append(1)
@@ -18,7 +17,7 @@ def extractLabels(input_file):
 			labels.append(0)
 
 		csv_reader.next()
-		
+	
 	return (labels, data)
 
 def main():
@@ -33,18 +32,12 @@ def main():
 	input_file = open(file_path, "rb")
 	#make a list of labels and data
 	lables = []
-	data = []
-	labels, data = extractLabels(input_file)
+	tweets = []
+	labels, tweets = extractLabels(input_file)
 	#generate a matrix of token counts
 	count_vectorizer = CountVectorizer()
-	#input = open(file_path, 'rb')
-	#make a list of sentences
-	feature_vectors = count_vectorizer.fit_transform(data)
+	feature_vectors = count_vectorizer.fit_transform(tweets)
 	vocabulary = count_vectorizer.get_feature_names()
-	"""
-	for word in vocabulary:
-		print word
-	"""
 	#learning by svm
 	svm_tuned_parameters = [
 		{
@@ -63,7 +56,7 @@ def main():
 	)
 
 	#make a list of labels
-	gscv.fit(feature_vectors, labels)#test label
+	gscv.fit(tweets, labels)#test label
 	svm_model = gscv.best_estimator_
 
 	print svm_model
