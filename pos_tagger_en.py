@@ -15,9 +15,6 @@ def extractLabels(input_file):
 			labels.append(1)
 		else:
 			labels.append(0)
-
-		csv_reader.next()
-	
 	return (labels, data)
 
 def main():
@@ -34,6 +31,7 @@ def main():
 	lables = []
 	tweets = []
 	labels, tweets = extractLabels(input_file)
+	print str(len(labels)) + ' ' + str(len(tweets))
 	#generate a matrix of token counts
 	count_vectorizer = CountVectorizer()
 	feature_vectors = count_vectorizer.fit_transform(tweets)
