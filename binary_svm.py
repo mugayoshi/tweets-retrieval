@@ -17,7 +17,6 @@ def extractLabels(input_file):
 	return (labels, data)
 
 def main():
-	#read input file
 	#extract sentences (tweets)
 	file_name = "csv_example.csv"
 	file_path = os.getcwd() + "/" + file_name
@@ -33,8 +32,6 @@ def main():
 	#generate a matrix of token counts
 	count_vectorizer = CountVectorizer()
 	feature_vectors = count_vectorizer.fit_transform(tweets)
-	#print len(feature_vectors.toarray()[0])
-	#vocabulary = count_vectorizer.get_feature_names()
 	#learning by svm
 	svm_tuned_parameters = [
 		{
