@@ -1,23 +1,15 @@
 import sys
 import os
-import treetaggerwrapper
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn import svm
 from sklearn.grid_search import GridSearchCV
 import csv
-def tagging(txt):
-	tagger = treetaggerwrapper.TreeTagger(TAGLANG='en', TAGDIR='/home/nak/muga/Downloads/')
-	unicode_txt = unicode(txt,'utf-8')
-	tags = tagger.tag_text(unicode_txt)
-	return tags
-
 def extractLabels(input_file):
 	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
 	labels = []
 	data = []
 	for row in csv_reader:
-		tags = tagging(row[5])
-		data.append(tags)
+		data.append(row[5])
 		if row[0] == "4":
 			labels.append(1)
 		else:
@@ -41,7 +33,8 @@ def main():
 	#generate a matrix of token counts
 	count_vectorizer = CountVectorizer()
 	feature_vectors = count_vectorizer.fit_transform(tweets)
-	vocabulary = count_vectorizer.get_feature_names()
+	#print len(feature_vectors.toarray()[0])
+	#vocabulary = count_vectorizer.get_feature_names()
 	#learning by svm
 	svm_tuned_parameters = [
 		{
@@ -60,7 +53,7 @@ def main():
 	)
 
 	#make a list of labels
-	gscv.fit(tweets, labels)#test label
+	gscv.fit(feature_vectors, labels)#test label
 	svm_model = gscv.best_estimator_
 
 	print svm_model
