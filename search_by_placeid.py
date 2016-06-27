@@ -2,6 +2,7 @@ import sys
 import os
 import twitter
 import json
+import time
 
 def getPlaceID(city_name):
 
@@ -41,7 +42,7 @@ def searchTweetByPlaceID(api, place_id):
 
 	results = search_results['statuses']
 
-	for _ in range(100):
+	for _ in range(10000):
 		print "length of results", len(results)
 		try:
 			next_results = search_results['search_metadata']['next_results']
@@ -68,12 +69,13 @@ def main():
 	print "place name: ", 
 	city_name = raw_input()
 #open output file
+	date = time.strftime("%d-%b-%y-%H-%M")
 	argvs = sys.argv
 	if len(argvs) > 1:
 		lang = argvs[1]
-		file_name = "search-result-" + lang + "-"+ city_name + ".txt"
+		file_name = "search-result-" + date + "-" + lang + "-"+ city_name + ".txt"
 	else:
-		file_name = "search-result-" + city_name + ".txt"
+		file_name = "search-result-" + date + "-" + city_name + ".txt"
 	output = open(file_name, 'w')
 
 #get place id
