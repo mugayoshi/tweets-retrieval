@@ -8,7 +8,14 @@ def extractLabels(input_file):
 	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
 	labels = []
 	data = []
+	non_utf_8 = 0
 	for row in csv_reader:
+		try:
+			row[5].decode('utf-8', 'strict')
+		except:
+			#print str(i) + ' ' + row[5] + ' contains non-utf-8 character'
+			non_utf_8 = non_utf_8 + 1
+			continue
 		data.append(row[5])
 		if row[0] == "4":
 			labels.append(1)
@@ -18,7 +25,8 @@ def extractLabels(input_file):
 
 def main():
 	#extract sentences (tweets)
-	file_name = "csv_example.csv"
+	print 'file name: ',
+	file_name = raw_input()
 	file_path = os.getcwd() + "/" + file_name
 	if os.path.isfile(file_path) == False:
 		print "the example file doesn't exist"
@@ -29,9 +37,12 @@ def main():
 	lables = []
 	tweets = []
 	labels, tweets = extractLabels(input_file)
+	print 'extracting data has done'
+
 	#generate a matrix of token counts
 	count_vectorizer = CountVectorizer()
 	feature_vectors = count_vectorizer.fit_transform(tweets)
+	print 'generating feature vectors has done'
 	#learning by svm
 	svm_tuned_parameters = [
 		{
@@ -50,7 +61,9 @@ def main():
 	)
 
 	#make a list of labels
-	gscv.fit(feature_vectors, labels)#test label
+	print 'Grid Search Cross Validation starts fitting ....'
+	gscv.fit(feature_vectors, labels)
+	print 'Fitting has done'
 	svm_model = gscv.best_estimator_
 
 	print svm_model
