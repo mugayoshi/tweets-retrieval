@@ -110,7 +110,7 @@ def main():
 
 	unknown_data_files = []
 	for f in os.listdir(os.getcwd()):
-		if 'tweets' in f and 'txt' in f:#collecting tweet data
+		if 'tweets' in f and 'txt' in f and not 'result' in f:#collecting tweet data
 			unknown_data_files.append(f)
 
 	for unknown_data_file in unknown_data_files:
