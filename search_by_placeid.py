@@ -73,9 +73,10 @@ def main():
 	argvs = sys.argv
 	if len(argvs) > 1:
 		lang = argvs[1]
-		file_name = "search-result-" + date + "-" + lang + "-"+ city_name + ".txt"
+		file_name = "tweets-" + date + "-" + lang + "-"+ city_name + ".txt"
 	else:
-		file_name = "search-result-" + date + "-" + city_name + ".txt"
+		file_name = "tweets-" + date + "-" + city_name + ".txt"
+	file_name = file_name.replace(' ', '')
 	output = open(file_name, 'w')
 
 #get place id
