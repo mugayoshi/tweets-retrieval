@@ -5,20 +5,24 @@ from sklearn import svm
 from sklearn.grid_search import GridSearchCV
 import csv
 import time 
-def writePredict(svm_model, feature_vectors, file_name):
-	print 'predicting starts'
+def writePredict(svm_model, feature_vectors, file_name, num_data):
+	print 'predicting ' + file_name + ' starts'
+	file_name = file_name.replace('.txt', '')
+	
 	results = svm_model.predict(feature_vectors)
-	date = time.strftime("%d-%b-%y-%H-%M")
-	output_file_name = date + "_predict_result_" + file_name + ".txt"
-	output_file = open(output_file_name, 'w')
 	print 'predicting has done'
+
+	date = time.strftime("%d-%b-%y-%H-%M")
+	output_file_name = "predict_result_" + date + '_' + file_name + + '_with' + num_data + "data.txt"
+	output_file = open(output_file_name, 'w')
 
 	print 'writing starts'
 	for item in results:
-		output_file.write('"%s, "' % item)
+		output_file.write('%s, ' % item)
 
 	output_file.close()
 	print 'writing has done'
+	
 	return
 	
 def extractData(file_path):
@@ -52,13 +56,17 @@ def extractLabels(input_file):
 
 def main():
 	#extract sentences (tweets)
-	print 'file name: ',
-	file_name = raw_input()
+	argvs = sys.argv
+	if len(argvs) == 1:
+		print 'please input file name of training data and the number of training data'
+		quit()
+	file_name = argvs[1]
 	file_path = os.getcwd() + "/" + file_name
 	if os.path.isfile(file_path) == False:
 		print "the example file doesn't exist"
 		quit()
-
+	
+	num_data = argvs[2]
 	input_file = open(file_path, "rb")
 	#make a list of labels and data
 	lables = []
@@ -97,19 +105,23 @@ def main():
 
 	print svm_model
 	
-	print 'classification starts'
+	print '\nclassification starts\n'
 
 	#unknown_data_file_name = raw_input()
-	unknown_data_file_name = "search-result-26-Jun-16-11-28en-Madrid.txt"
-	file_path = os.getcwd() + "/" + unknown_dat_file_name
-	if os.path.isfile(file_path) == False:
-		print "this file doesn't exist"
-		quit()
-	unknown_data = extractData(file_path)
-	count_vectorizer = CountVectorizer(vocabulary=vocabulary_training_data)
-	feature_vectors_unknown_data = count_vectorizer.fit_transform(unknown_data)
+	unknown_data_files = ["search-result-26-Jun-16-11-28en-Madrid.txt", "search-result-29-Jun-16-10-42-New York.txt"]
+	for unknown_data_file in unknown_data_files:
+		file_path = os.getcwd() + "/" + unknown_data_file
+		if os.path.isfile(file_path) == False:
+			print unknown_data_file + " doesn't exist"
+			quit()
 
-	writePredict(svm_model, feature_vectors_unknown_data, unknown_data_file_name)
+		print 'predicting ' + unknown_data_file 
+		unknown_data = extractData(file_path)
+		count_vectorizer = CountVectorizer(vocabulary=vocabulary_training_data)
+		feature_vectors_unknown_data = count_vectorizer.fit_transform(unknown_data)
+		
+		writePredict(svm_model, feature_vectors_unknown_data, unknown_data_file, num_data)
+		print 'predicting ' + unknown_data_file + ' has done'
 
 if __name__ == "__main__":
 	main()
