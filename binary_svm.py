@@ -6,22 +6,19 @@ from sklearn.grid_search import GridSearchCV
 import csv
 import time 
 def writePredict(svm_model, feature_vectors, file_name, num_data):
-	print 'predicting ' + file_name + ' starts'
 	file_name = file_name.replace('.txt', '')
 	
 	results = svm_model.predict(feature_vectors)
 	print 'predicting has done'
 
 	date = time.strftime("%d-%b-%y-%H-%M")
-	output_file_name = "predict_result_" + date + '_' + file_name + + '_with' + num_data + "data.txt"
+	output_file_name = "predict_result_" + date + '_' + file_name + '_with' + num_data + "data.txt"
 	output_file = open(output_file_name, 'w')
 
-	print 'writing starts'
 	for item in results:
 		output_file.write('%s, ' % item)
 
 	output_file.close()
-	print 'writing has done'
 	
 	return
 	
@@ -67,6 +64,10 @@ def main():
 		quit()
 	
 	num_data = argvs[2]
+	if not num_data in file_name:
+		print "file name doesn't match the number of data"
+		quit()
+
 	input_file = open(file_path, "rb")
 	#make a list of labels and data
 	lables = []
@@ -107,15 +108,17 @@ def main():
 	
 	print '\nclassification starts\n'
 
-	#unknown_data_file_name = raw_input()
-	unknown_data_files = ["search-result-26-Jun-16-11-28en-Madrid.txt", "search-result-29-Jun-16-10-42-New York.txt"]
+	unknown_data_files = []
+	for f in os.listdir(os.getcwd()):
+		if 'tweets' in f and 'txt' in f:#collecting tweet data
+			unknown_data_files.append(f)
+
 	for unknown_data_file in unknown_data_files:
 		file_path = os.getcwd() + "/" + unknown_data_file
 		if os.path.isfile(file_path) == False:
 			print unknown_data_file + " doesn't exist"
 			quit()
 
-		print 'predicting ' + unknown_data_file 
 		unknown_data = extractData(file_path)
 		count_vectorizer = CountVectorizer(vocabulary=vocabulary_training_data)
 		feature_vectors_unknown_data = count_vectorizer.fit_transform(unknown_data)
