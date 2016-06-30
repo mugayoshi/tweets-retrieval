@@ -29,21 +29,21 @@ def getPlaceID(city_name):
 		s = input.readline()
 	return place_id_dict
 
-def searchTweetByPlaceID(api, place_id):
+def searchTweetByPlaceID(api, place_id, place_name):
 	last_id = None
 	count = 1000
 	#get language parameter
 	lang = ''
 	argvs = sys.argv
-	if len(argvs) > 1:
-		lang = argvs[1]
+	if len(argvs) == 3:
+		lang = argvs[2]
 
 	search_results = api.search.tweets(q="place:%s" % place_id ,count=count, max_id=last_id, lang=lang)
 
 	results = search_results['statuses']
 
 	for _ in range(10000):
-		print "length of results", len(results)
+		print "length of results: " + str(len(results)) + ' from ' + place_name[0] + place_name[1]
 		try:
 			next_results = search_results['search_metadata']['next_results']
 		except KeyError, e:
@@ -66,26 +66,30 @@ def main():
 
 	twitter_api = twitter.Twitter(auth=auth)
 #    num_results = 500
-	print "place name: ", 
-	city_name = raw_input()
 #open output file
-	date = time.strftime("%d-%b-%y-%H-%M")
+	date = time.strftime("%d-%b-%Y:%H:%M")
 	argvs = sys.argv
-	if len(argvs) > 1:
-		lang = argvs[1]
+	if len(argvs) == 3:
+		city_name = argvs[1]
+		lang = argvs[2]
 		file_name = "tweets-" + date + "-" + lang + "-"+ city_name + ".txt"
-	else:
+	elif len(argvs) == 2:
+		city_name = argvs[1]
 		file_name = "tweets-" + date + "-" + city_name + ".txt"
+	else:
+		print 'please input city name and languange if necessary'
+		quit()
+		#file_name = "tweets-" + date + "-" + city_name + ".txt"
 	file_name = file_name.replace(' ', '')
 	output = open(file_name, 'w')
 
 #get place id
 	place_id_dict = getPlaceID(city_name)
 	for place in place_id_dict.keys():
-		results = searchTweetByPlaceID(twitter_api, place)
-
 		place_name = place_id_dict[place]
+		results = searchTweetByPlaceID(twitter_api, place, place_name)
 		place_info = "------- " + place_name[0] + " -------\n"
+
 		#output.write(place_info.decode('utf-8'))
 		output.write(place_info)
 
@@ -97,7 +101,7 @@ def main():
 				#output.write(s.decode('utf-8'))
 				output.write(s)
 		else:
-			print "no result from " + place[0] + place[1] 
+			print "no result from " + place_name[0] + place_name[1] 
 
 	output.close()
 
