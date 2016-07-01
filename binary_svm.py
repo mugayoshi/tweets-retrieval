@@ -9,7 +9,6 @@ def writePredict(svm_model, feature_vectors, file_name, num_data):
 	file_name = file_name.replace('.txt', '')
 	
 	results = svm_model.predict(feature_vectors)
-	print 'predicting has done'
 
 	date = time.strftime("%d-%b-%y-%H-%M")
 	output_file_name = "predict_result_" + date + '_' + file_name + '_with' + num_data + "data.txt"
@@ -46,15 +45,15 @@ def extractLabels(input_file):
 			continue
 		data.append(row[5])
 		if row[0] == "4":
-			labels.append(1)
+			labels.append(1)#positive
 		else:
-			labels.append(0)
+			labels.append(0)#negative
 	return (labels, data)
 
 def main():
 	#extract sentences (tweets)
 	argvs = sys.argv
-	if len(argvs) == 1:
+	if len(argvs) != 3:
 		print 'please input file name of training data and the number of training data'
 		quit()
 	file_name = argvs[1]
@@ -120,6 +119,9 @@ def main():
 			quit()
 
 		unknown_data = extractData(file_path)
+		if len(unknown_data) < 1:
+			print 'there is no data in ' + unknown_data_file
+			continue
 		count_vectorizer = CountVectorizer(vocabulary=vocabulary_training_data)
 		feature_vectors_unknown_data = count_vectorizer.fit_transform(unknown_data)
 		
