@@ -21,21 +21,26 @@ def main():
 	#random_num = random_positive + random_negative
 	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
 	for row in csv_reader:
+		if not line_num in random_num:
+			continue
 		try:
 			row[5].decode('utf-8', 'strict')
 		except:
-			
-			continue
-		line_num = csv_reader.line_num
-		if line_num in random_num:
-			line = [line_num]
-			for item in row:
-				line.append(item)
-			writer_output.writerow(line)
-			sys.stdout.write('\r%d' % line_num)
-			sys.stdout.flush()
-			time.sleep(0.01)
 			random_num.remove(line_num)
+			if line_num < 800000:
+				random_num.add(random.randint(0, 800000))
+			else:
+				random_num.add(random.randint(800000, 1600000))
+			continue
+		line = [line_num]#adding line number to the row
+		for item in row:
+			line.append(item)
+		
+		writer_output.writerow(line)
+		sys.stdout.write('\r%d' % line_num)
+		sys.stdout.flush()
+		time.sleep(0.01)
+		random_num.remove(line_num)
 	print '\n'
 	output_file.close()
 
