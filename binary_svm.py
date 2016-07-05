@@ -53,7 +53,7 @@ def extractLabels(input_file):
 def main():
 	#extract sentences (tweets)
 	argvs = sys.argv
-	if len(argvs) != 3:
+	if len(argvs) < 3:
 		print 'please input file name of training data and the number of training data'
 		quit()
 	file_name = argvs[1]
@@ -81,9 +81,13 @@ def main():
 	
 	print 'generating feature vectors has done'
 	#learning by svm
+	if len (argvs) == 4:
+		kernel = argvs[3]
+	else:
+		kernel = 'rbf'
 	svm_tuned_parameters = [
 		{
-			'kernel':['rbf'],
+			'kernel':[kernel],
 			'gamma':[2 ** n for n in range(-15, 3)],
 			'C':[2 ** n for n in range(-5, 15)]
 		}
