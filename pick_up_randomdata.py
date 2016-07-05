@@ -28,7 +28,10 @@ def main():
 			continue
 		line_num = csv_reader.line_num
 		if line_num in random_num:
-			writer_output.writerow(row)
+			line = [line_num]
+			for item in row:
+				line.append(item)
+			writer_output.writerow(line)
 			sys.stdout.write('\r%d' % line_num)
 			sys.stdout.flush()
 			time.sleep(0.01)
