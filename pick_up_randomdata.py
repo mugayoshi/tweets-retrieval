@@ -21,6 +21,7 @@ def main():
 	#random_num = random_positive + random_negative
 	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
 	for row in csv_reader:
+		line_num = csv_reader.line_num
 		if not line_num in random_num:
 			continue
 		try:
