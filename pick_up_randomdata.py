@@ -9,13 +9,13 @@ def main():
 	num_sample = int(num_data) / 2
 	output_file = open('random_picked_' + str(num_data) + 'data.csv', 'ab')
 	writer_output = csv.writer(output_file)
-	corpus_file_path = "/home/nak/muga/annotated_corpus/twitter/senti140/training.1600000.processed.noemoticon.csv"
+	corpus_file_path = "/home/nak/muga/twitter/refined_tweet_data_en.csv"
 
 
 	#0-799,999:positive
 	#800,000-:negative
 	random_positive = random.sample(xrange(800000), num_sample)
-	random_negative = random.sample(xrange(800000, 1600000), num_sample)
+	random_negative = random.sample(xrange(800000, 1598715), num_sample)# 1598715 is actual number of tweet data
 	random_num = random_positive + random_negative
 	input_file = open(corpus_file_path, "rb")
 	#random_num = random_positive + random_negative
@@ -27,11 +27,7 @@ def main():
 		try:
 			row[5].decode('utf-8', 'strict')
 		except:
-			random_num.remove(line_num)
-			if line_num < 800000:
-				random_num.add(random.randint(0, 800000))
-			else:
-				random_num.add(random.randint(800000, 1600000))
+			
 			continue
 		line = [line_num]#adding line number to the row
 		for item in row:
