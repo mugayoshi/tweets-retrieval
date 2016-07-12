@@ -6,15 +6,24 @@ from sklearn.grid_search import GridSearchCV
 import csv
 import time 
 from sklearn.metrics import precision_score, recall_score, f1_score
-def print_evaluation(y_true, y_pred):
-	print "precision : %.2f" % precision_score(y_true, y_pred, average='binary')
-	print "recall : %.2f" % recall_score(y_true, y_pred, average='binary')
-	print "f1 : %.2f" % f1_score(y_true, y_pred, average='binary')
+def print_evaluation(y_true, y_pred, num_data, output_file, testdata_file):
+	if len(output_file) == 0:
+		print "precision : %.2f" % precision_score(y_true, y_pred, average='binary')
+		print "recall : %.2f" % recall_score(y_true, y_pred, average='binary')
+		print "f1 : %.2f" % f1_score(y_true, y_pred, average='binary')
+	else:
+		out = open(output_file, 'a')
+		precision = precision_score(y_true, y_pred, average='binary')
+		recall = recall_score(y_true, y_pred, average='binary')
+		f1 = f1_score(y_true, y_pred, average='binary')
+		result = 'test data: ' + testdata_file + ' ' + num_data + ' data\nprecision : ' + str(precision) + '\nrecall : ' + str(recall) + '\nf1 : ' + str(f1) + '\n'
+		out.write(result)
+		out.close()
 	return 
 
-def evaluate(svm_model, feature_vectors, file_name, num_data, answers):
+def evaluate(svm_model, feature_vectors, testdata_file, num_data, answers, output):
 	predicts = svm_model.predict(feature_vectors)
-	print_evaluation(answers, predicts)
+	print_evaluation(answers, predicts, num_data, output, testdata_file)
 	return
 	
 def extractData(file_path):
@@ -77,11 +86,20 @@ def main():
 	
 	print 'generating feature vectors has done'
 	#learning by svm
-	if len (argvs) == 4:
+	if len (argvs) > 4:
 		kernel = argvs[3]
-	else:
 		print 'kernel: ' + kernel
+	else:
 		kernel = 'rbf'
+	
+	if len(argvs) == 5:
+		output_file = argvs[4]
+		out = open(output_file, 'w')
+		out.write('training data ' + file_name + '\n')
+		out.close()
+	else:
+		output_file = ''
+
 	svm_tuned_parameters = [
 		{
 			'kernel':[kernel],
@@ -131,7 +149,7 @@ def main():
 		count_vectorizer = CountVectorizer(vocabulary=vocabulary_training_data)
 		feature_vectors_testdata = count_vectorizer.fit_transform(testdata)
 		
-		evaluate(svm_model, feature_vectors_testdata, testdata_file, num_data, answers)
+		evaluate(svm_model, feature_vectors_testdata, testdata_file, num_data, answers, output_file)
 		print 'evaluating ' + testdata_file + ' has done'
 
 if __name__ == "__main__":
