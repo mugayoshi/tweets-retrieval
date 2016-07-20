@@ -1,6 +1,8 @@
+import csv
 import os
 import sys
 import pandas as pd
+import shutil
 
 def replaceWithNum(filename, sentiment_str, sentiment_value):
 	with open(filename) as f:
@@ -31,6 +33,20 @@ def main():
 		replaceWithNum(output_file, 'negative', '1')
 		replaceWithNum(output_file, 'neutral', '2')
 		replaceWithNum(output_file, 'na', '3')
-	
+		
+		src = '/home/nak/muga/twitter/' + output_file
+		dest = '/home/nak/muga/twitter/train_data/' + output_file
+		#add "" to each item in a row
+		csv_input = open(src, "rb")
+		reader = csv.reader(csv_input)
+		csv_output = open(dest, 'wb')
+		writer = csv.writer(csv_output, delimiter=',', lineterminator='\n', quotechar='"', quoting=csv.QUOTE_ALL)
+		header = next(reader)
+		for row in reader:
+			writer.writerow(row)
+		csv_input.close()
+		csv_output.close()
+		os.remove(src)
+		
 if __name__ == '__main__':
 	main()
