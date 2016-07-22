@@ -31,7 +31,7 @@ def extractData(file_path):
 	
 	return data
 
-def extractLabels(input_file):
+def extractTweetsAndLabel(input_file):
 	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
 	labels = []
 	data = []
@@ -71,7 +71,7 @@ def main():
 	#make a list of labels and data
 	lables = []
 	tweets = []
-	labels, tweets = extractLabels(input_file)
+	labels, tweets = extractTweetsAndLabel(input_file)
 	print 'extracting data has done'
 
 	#generate a matrix of token counts
