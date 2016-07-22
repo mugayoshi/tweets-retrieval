@@ -33,7 +33,8 @@ def getSentimentDataList(data):
 
 def getAffectedValue(sentiment_values):
 	if len(sentiment_values) == 1:
-		return sentiment_values[0]
+		return getAffectedValueWithNum(sentiment_values[0])
+
 	label_counts = {'pos': 0, 'neg': 0, 'neu': 0, 'na': 0}
 	for x in sentiment_values:
 		if x == 'pos':
@@ -48,10 +49,22 @@ def getAffectedValue(sentiment_values):
 		elif x == 'n/a':
 			na = label_counts['na']
 			label_counts['na'] = na + 1
-	"""print label_counts
-	quit()"""
-	return max(label_counts, key=label_counts.get)#necessary to consider how to decide return value 
 
+	return getAffectedValueWithNum(max(label_counts, key=label_counts.get))#necessary to consider how to decide return value 
+	
+def getAffectedValueWithNum(affected_value):
+	if affected_value == 'pos':
+		return 0
+	elif affected_value == 'neg':
+		return 1
+	elif affected_value == 'neu':
+		return 2
+	elif affected_value == 'na' or affected_value == 'n/a':
+		return 3
+	else:
+		return -1
+	
+	return -1
 
 def main():
 	argvs = sys.argv
@@ -59,15 +72,18 @@ def main():
 		print 'please input the output file name'
 		quit()
 	file_name = argvs[1]
-	output_file = open(file_name, 'wb')
-	#output_file = open('tweet_data_es.csv', 'wb')
+	out_path = '/home/nak/muga/twitter/data_for_test2/'
+	output_file = open(out_path + file_name, 'wb')
 
-	filepath = '/home/nak/muga/annotated_corpus/twitter/spanish/TASS/general-tweets-train-tagged.xml'
+	#could choose train or test data
+	#filepath = '/home/nak/muga/annotated_corpus/twitter/spanish/TASS/general-tweets-train-tagged.xml'
+	filepath = '/home/nak/muga/annotated_corpus/twitter/spanish/TASS/general-tweets-test.xml'
 	tree = ET.parse(filepath)
 	elem = tree.getroot()
 	for e in list(elem):#e corresponds to a tweet data
 		tweet = ''
 		sentiment_values = []
+		affected_value = -1
 		for c in list(e):
 			if c.tag == 'content':
 				tweet = c.text
@@ -79,8 +95,8 @@ def main():
 		elif len(tweet) == 0:
 			continue
 		affected_value = getAffectedValue(sentiment_values)
-		#line = '"' + tweet + '", ' + ' '.join(sentiment_values) + '\n'
-		line = '"' + tweet + '", ' + affected_value + '\n'
+		#print affected_value
+		line = '"' + str(affected_value) + '", "' + tweet + '"\n'
 		output_file.write(line.encode('utf-8'))#necessary to encode otherwise cannot write strings
 
 	output_file.close()
