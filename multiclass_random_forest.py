@@ -18,7 +18,7 @@ def classification(filename):
 
 	date = time.strftime('%Y%m%d-%H%M%S')
 	out_file_name = filename.split('/')[-1].split('_')[0] + '_classsification_result_' + date + '.txt'
-	out_file_path = os.getcwd() + "/" + out_file_name
+	out_file_path = os.getcwd() + "/classification_result/" + out_file_name #this script is assumed to be  executed at twitter directory
 
 	out = open(out_file_path, 'a')
 	#pp = pprint.PrettyPrinter(indent=4)
@@ -83,11 +83,12 @@ def getFeatureVecAndLabel(filename):
 
 def main():
 
-	train_datas_path = '/home/nak/muga/twitter/data_for_test/'
+	train_datas_path = '/home/nak/muga/twitter/data_for_test2/'
 	train_datas = []
 	for f in os.listdir(train_datas_path):
-		if f.endswith('.csv') and 'sentiment' in f:
+		if f.endswith('.csv') and 'merge' in f:
 			train_datas.append(train_datas_path + f)
+	
 	for f in train_datas:
 		classification(f)
 
