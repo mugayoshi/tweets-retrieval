@@ -68,18 +68,23 @@ def getAffectedValueWithNum(affected_value):
 
 def main():
 	argvs = sys.argv
-	if len(argvs) < 2:
-		print 'please input the output file name'
+	if len(argvs) < 3:
+		print 'please input the output file name and option(-test or -train)'
 		quit()
 	file_name = argvs[1]
+	option = argvs[2]
 	out_path = '/home/nak/muga/twitter/data_for_test2/'
 	output_file = open(out_path + file_name, 'wb')
 
 	#could choose train or test data
-	#filepath = '/home/nak/muga/annotated_corpus/twitter/spanish/TASS/general-tweets-train-tagged.xml'
-	filepath = '/home/nak/muga/annotated_corpus/twitter/spanish/TASS/general-tweets-test.xml'
+	if option == '-train':
+		filepath = '/home/nak/muga/annotated_corpus/twitter/spanish/TASS/general-tweets-train-tagged.xml'
+	elif option == '-test':
+		filepath = '/home/nak/muga/annotated_corpus/twitter/spanish/TASS/general-tweets-test.xml'
+
 	tree = ET.parse(filepath)
 	elem = tree.getroot()
+	num_tweets = 0
 	for e in list(elem):#e corresponds to a tweet data
 		tweet = ''
 		sentiment_values = []
@@ -98,8 +103,10 @@ def main():
 		#print affected_value
 		line = '"' + str(affected_value) + '", "' + tweet + '"\n'
 		output_file.write(line.encode('utf-8'))#necessary to encode otherwise cannot write strings
+		num_tweets = num_tweets + 1
 
 	output_file.close()
+	print 'there are ' + str(num_tweets) + ' tweets in ' + filepath.split('/')[-1]
 
 if __name__ == "__main__":
 		main()
