@@ -31,9 +31,10 @@ def getSentimentDataList(data):
 
 	return sentiment_values
 
-def getAffectedValue(sentiment_values):
+def getAffectedValue(sentiment_values, tweet):
 	if len(sentiment_values) == 1:
 		return getAffectedValueWithNum(sentiment_values[0])
+
 
 	label_counts = {'pos': 0, 'neg': 0, 'neu': 0, 'na': 0}
 	for x in sentiment_values:
@@ -66,6 +67,25 @@ def getAffectedValueWithNum(affected_value):
 	
 	return -1
 
+def replaceURLAndUsername(tweet):
+	tweet_original = tweet.encode('utf-8')
+	tweet = tweet.encode('utf-8')
+	modified = False
+	
+	for word in tweet.split(' '):
+		if 'http' in word:
+			tweet = tweet.replace(word, '~http')
+			modified = True
+		elif '@' in word:
+			tweet = tweet.replace(word, '@user')
+			modified = True
+	"""
+	if modified == True:
+		print 'original\n' + tweet_original
+		print '-> ' + tweet
+	"""
+	return tweet.decode('utf-8')
+
 def main():
 	argvs = sys.argv
 	if len(argvs) < 3:
@@ -85,6 +105,7 @@ def main():
 	tree = ET.parse(filepath)
 	elem = tree.getroot()
 	num_tweets = 0
+	count = 0 #for counting how many tweets have multiple affected values
 	for e in list(elem):#e corresponds to a tweet data
 		tweet = ''
 		sentiment_values = []
@@ -99,14 +120,21 @@ def main():
 			continue
 		elif len(tweet) == 0:
 			continue
-		affected_value = getAffectedValue(sentiment_values)
+		
+		tweet = replaceURLAndUsername(tweet)
+		if len(sentiment_values) > 1:
+			count = count + 1
+		if 'pos' in sentiment_values and 'neg' in sentiment_values:
+			print tweet.encode('utf-8')	
+
+		affected_value = getAffectedValue(sentiment_values, tweet)
 		#print affected_value
 		line = '"' + str(affected_value) + '", "' + tweet + '"\n'
 		output_file.write(line.encode('utf-8'))#necessary to encode otherwise cannot write strings
 		num_tweets = num_tweets + 1
 
 	output_file.close()
-	print 'there are ' + str(num_tweets) + ' tweets in ' + filepath.split('/')[-1]
+	print str(count) + ' tweets have several affected values in ' + filepath.split('/')[-1]
 
 if __name__ == "__main__":
 		main()
