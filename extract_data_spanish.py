@@ -100,11 +100,12 @@ def main():
 	if option == '-train':
 		filepath = '/home/nak/muga/annotated_corpus/twitter/spanish/TASS/general-tweets-train-tagged.xml'
 	elif option == '-test':
-		filepath = '/home/nak/muga/annotated_corpus/twitter/spanish/TASS/general-tweets-test.xml'
+		filepath = '/home/nak/muga/annotated_corpus/twitter/spanish/TASS/general-tweets-test-tagged.xml'
 
 	tree = ET.parse(filepath)
 	elem = tree.getroot()
 	num_tweets = 0
+	none_count = 0
 	count = 0 #for counting how many tweets have multiple affected values
 	for e in list(elem):#e corresponds to a tweet data
 		tweet = ''
@@ -115,8 +116,9 @@ def main():
 				tweet = c.text
 			elif c.tag == 'sentiments':
 				sentiment_values = getSentimentDataList(c)
-
+				sentiment_values = list(set(sentiment_values))
 		if tweet is None or sentiment_values is None:
+			none_count = none_count + 1
 			continue
 		elif len(tweet) == 0:
 			continue
@@ -124,17 +126,25 @@ def main():
 		tweet = replaceURLAndUsername(tweet)
 		if len(sentiment_values) > 1:
 			count = count + 1
-		if 'pos' in sentiment_values and 'neg' in sentiment_values:
-			print tweet.encode('utf-8')	
-
-		affected_value = getAffectedValue(sentiment_values, tweet)
-		#print affected_value
-		line = '"' + str(affected_value) + '", "' + tweet + '"\n'
+		#if 'pos' in sentiment_values and 'neg' in sentiment_values:
+			#print tweet.encode('utf-8')
+		
+		"""
+		affected_val = getAffectedValueWithNum(sentiment_val)
+		line = '"' + str(affected_val) + '", "' + tweet + '"\n'
 		output_file.write(line.encode('utf-8'))#necessary to encode otherwise cannot write strings
+		"""
+		affected_value = getAffectedValue(sentiment_values, tweet)
+		for sentiment_val in sentiment_values:#wrtie the data to the output file each sentiment value
+			affected_val = getAffectedValueWithNum(sentiment_val)
+			line = '"' + str(affected_val) + '", "' + tweet + '"\n'
+			output_file.write(line.encode('utf-8'))#necessary to encode otherwise cannot write strings
+
 		num_tweets = num_tweets + 1
 
 	output_file.close()
-	print str(count) + ' tweets have several affected values in ' + filepath.split('/')[-1]
+	print str(count) + ' tweets have several affected values out of ' + str(num_tweets) + ' tweets in ' + filepath.split('/')[-1]
+	print 'there are ' + str(none_count) + ' Nones '
 
 if __name__ == "__main__":
 		main()
