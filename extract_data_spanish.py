@@ -3,17 +3,6 @@ import sys
 import csv
 import operator
 
-def getSentimentData(data):
-	sentiment_value = ''
-	for gc in list(data):
-		l = [x for x in gc.itertext()]
-		value = ''
-		for el in l:
-			value += el + ' '
-		value += ', '
-		sentiment_value += value
-	return sentiment_value
-
 def getSentimentDataList(data):
 #each label string must be replace with number
 	sentiment_values = []
@@ -28,7 +17,6 @@ def getSentimentDataList(data):
 				sentiment_values.append('neu')
 			elif x == 'NONE':
 				sentiment_values.append('n/a')
-
 	return sentiment_values
 
 def getAffectedValue(sentiment_values, tweet):
@@ -86,6 +74,26 @@ def replaceURLAndUsername(tweet):
 	"""
 	return tweet.decode('utf-8')
 
+def getSentimentValue(data):
+	prev_tag = ''
+	for node in data.iter():
+		if prev_tag == 'polarity' and node.tag == 'value':
+			sentiment_value = node.text
+			break
+		prev_tag = node.tag
+	
+	if sentiment_value == 'PP' or sentiment_value == 'P' or sentiment_value == 'P+':
+		return 0
+	elif sentiment_value == 'N+' or sentiment_value == 'N' or sentiment_value == 'NN':
+		return 1
+	elif sentiment_value == 'NEU':
+		return 2
+	elif sentiment_value == 'NONE':
+		return 3
+	
+	return -1
+
+
 def main():
 	argvs = sys.argv
 	if len(argvs) < 3:
@@ -110,6 +118,7 @@ def main():
 	for e in list(elem):#e corresponds to a tweet data
 		tweet = ''
 		sentiment_values = []
+		sentiment_value = ''
 		affected_value = -1
 		for c in list(e):
 			if c.tag == 'content':
@@ -117,6 +126,8 @@ def main():
 			elif c.tag == 'sentiments':
 				sentiment_values = getSentimentDataList(c)
 				sentiment_values = list(set(sentiment_values))
+				sentiment_value = getSentimentValue(c)
+
 		if tweet is None or sentiment_values is None:
 			none_count = none_count + 1
 			continue
@@ -126,12 +137,8 @@ def main():
 		tweet = replaceURLAndUsername(tweet)
 		if len(sentiment_values) > 1:
 			count = count + 1
-		#if 'pos' in sentiment_values and 'neg' in sentiment_values:
-			#print tweet.encode('utf-8')
-		
-		"""
-		affected_val = getAffectedValueWithNum(sentiment_val)
-		line = '"' + str(affected_val) + '", "' + tweet + '"\n'
+
+		line = '"' + str(sentiment_value) + '", "' + tweet + '"\n'
 		output_file.write(line.encode('utf-8'))#necessary to encode otherwise cannot write strings
 		"""
 		affected_value = getAffectedValue(sentiment_values, tweet)
@@ -139,7 +146,7 @@ def main():
 			affected_val = getAffectedValueWithNum(sentiment_val)
 			line = '"' + str(affected_val) + '", "' + tweet + '"\n'
 			output_file.write(line.encode('utf-8'))#necessary to encode otherwise cannot write strings
-
+		"""
 		num_tweets = num_tweets + 1
 
 	output_file.close()
