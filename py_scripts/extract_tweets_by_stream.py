@@ -33,9 +33,14 @@ def validateTweet(tweet):
 def main():
 
 	argvs = sys.argv
-	#q = argvs[1]
+	lang = argvs[1]
 	q = ':), :D, :-), ;)'
 	languages = ['en', 'fr', 'es', 'de', 'pt']
+	if not lang in languages:
+		print 'this language is not valid'
+		quit()
+	
+	#emotion = argvs[2]
 	smiley = ':-), :-], :-3. :->, 8-), :-}, :o), :c), :^), :), :], :>,8), :}, =], =), :-))'
 	laugh = ":-D, 8-D, x-D, X-D, B^D, :D, 8D, xD, XD, =D, =3, :'-), :')"
 	kiss = ':-*, :*, :x'
@@ -43,9 +48,18 @@ def main():
 	heart = '<3'
 	yay = '\o/'
 
+	sad_angry = ':-(, :(, :c, :-c,  :<, :-<, :-[, :[, :-||, >:[, :{, :@, >:('
+	skeptical_annoyed = ':-/, :/, :-., >:\, >:/, :\, =/, =\, :L, :=L, :S'
+	crying = ":'-(, :'(i, ('_'), (/_;), (T_T), (;_;), (;_;, (;_:), (;O;)"
+	troubled = '>.<, (>_<), (>_<)>, (-_-;)'
+	looking_down = '(..), (._.)'
+
+	neutral = ':-|, :|'
+	q = neutral
+	lang = 'en'
 	twitter_api = oauth_login()
 	twitter_stream = twitter.TwitterStream(auth=twitter_api.auth)
-	stream = twitter_stream.statuses.filter(track=q, language='de')
+	stream = twitter_stream.statuses.filter(track=q, language=lang)
 	
 	#print 'length of stream is ' + len(stream)
 	count = 0
