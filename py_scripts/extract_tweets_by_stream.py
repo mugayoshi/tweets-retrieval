@@ -1,6 +1,7 @@
 import io, json
 import twitter
 import sys
+import time
 def oauth_login():
 	CONSUMER_KEY='yh0ltpdidxnb4y10h1zUOmz20'
 	CONSUMER_KEY_SECRET='XjJiiuHV7SWdYEUOuzTcFhLef0bmawoAJSisKM52pApd6gfWho'
@@ -55,22 +56,28 @@ def main():
 	looking_down = '(..), (._.)'
 
 	neutral = ':-|, :|'
-	q = neutral
+	#q = neutral
 	lang = 'en'
 	twitter_api = oauth_login()
 	twitter_stream = twitter.TwitterStream(auth=twitter_api.auth)
 	stream = twitter_stream.statuses.filter(track=q, language=lang)
 	
-	#print 'length of stream is ' + len(stream)
+	date = time.strftime("%d-%b-%Y:%H:%M")
+	file_name = "tweets-" + date + "-" + lang + "-from_stream.txt"#this text file should be moved to another directory
+	output = open(file_name, 'w')
+
+#print 'length of stream is ' + len(stream)
 	count = 0
 	for tweet in stream:
 		txt = tweet['text']
 		if validateTweet(txt):
 			print txt
+			s = json.dumps(tweet['text'], indent=1) + "\n"#need to modify !!
+			output.write(s)
 			count = count + 1
 		if count > 100:
 			break
-	
+	output.close()
 
 if __name__ == "__main__":
 	main()
