@@ -63,6 +63,100 @@ def getEmoticonList(emotion):
 	
 	return ''
 
+def make_twitter_request(twitter_api_func, max_errors=10, *args, **kw):
+	def handle_twitter_http_error(e, wait_period=2, sleep_when_rate_limited=True):
+		if wait_period > 3600:
+			print >> sys.stderr, 'too many retries, quitting'
+			raise e
+
+		if e.e.code == 401:
+			print >> sys.stderr, 'encountered 401 error(Not Authorised)'
+			return None
+		elif e.e.code == 404:
+			print >> sys.stderr, 'encountered 404 error(Not Found)'
+			return None
+		elif e.e.code == 429:
+			print >> sys.stderr, 'encountered 429 error(Rate Limit Exceeded)'
+			if sleep_wait_when_limited:
+				print >> sys.stderr, 'Retrying in 15 minutes...zz....'
+				sys.stderr.flush()
+				time.sleep(60*15 + 5)
+				print >> sts.stderr, '.zzz.. Awake now and trying again.'
+				return 2
+			else:
+				raise e
+		elif e.e.code in (500, 502, 503, 504):
+			print >> sys.stderr, 'encountered %i error. retrying in %i seconds' % (e.e.code, wait_period)
+			time.sleep(wait_period)
+			wait_period *= 1.5
+			return wait_period
+		else:
+			raise e
+		# end of handle_twitter_http_error
+
+	wait_period = 2
+	error_count = 0
+
+	while True:
+		try:
+			return twitter_api_func(*args, **kw)
+		except twitter.api.TwitterHTTPError, e:
+			error_count = 0
+			wait_period = handle_twitter_http_error(e, wait_period)
+			if wait_period is None:
+				return
+		except URLError, e:
+			error_count += 1
+			print >> sys.stderr, "URLError encountered continuing. "
+			if error_count > max_errors:
+				print >> sys.stderr, "too many consecutive errors...bailing out."
+				raise
+		except BadStatusLine, e:
+			error_count += 1
+			print >> sys.stderr, "BadStatusError encountered. continuing. "
+			if error_count > max_errors:
+				print >> sys.stderr, "Too many consecutive errors... bailing out. "
+				raise
+	
+def obtainTweetsFromStream(twitter_api, q, lang, emotion):
+	kw = {}
+	kw['track'] = q
+	kw['language'] = lang
+	twitter_stream = twitter.TwitterStream(auth=twitter_api.auth)
+	tweets = make_twitter_request(twitter_stream.statuses.filter, **kw)
+	max_results = 1000#can be modified
+	
+	date = time.strftime("%d-%b-%Y-%H-%M")
+	file_name = "tweets-" + date + "-" + lang + "-" + emotion + "-from_stream.txt"#this text file should be moved to another directory
+	output = open(file_name, 'w')
+	
+	count = 0
+	for tweet in tweets:
+		txt = tweet['text']
+		if validateTweet(txt, emotion):
+			s = json.dumps(tweet['text'], indent=1) + "\n"
+			output.write(s)
+			count = count + 1
+			if count % 100 == 0:
+				print count + ': ' + txt
+	
+	print 'goes into the while loop'
+	while len(tweets) > 0 and count < max_results:
+		tweets = make_twitter_requet(twitter_stream.statuses.filter, **kw)
+		for tweet in tweets:
+			txt = tweet['text']
+			if validateTweet(txt, emotion):
+				s = json.dumps(tweet['text'], indent=1) + "\n"
+				output.write(s)
+				count = count + 1
+				if count % 100 == 0:
+					print count + ': ' + txt
+	print 'goes out from the while loop'
+	output.close()
+	print 'Extracting ' + emotion + ' tweets of ' + lang + ' has done.'
+	return
+	
+
 def main():
 
 	argvs = sys.argv
@@ -98,6 +192,8 @@ def main():
 	
 	#lang = 'en'
 	twitter_api = oauth_login()
+	obtainTweetsFromStream(twitter_api, q, lang, emotion)
+	"""
 	twitter_stream = twitter.TwitterStream(auth=twitter_api.auth)
 	stream = twitter_stream.statuses.filter(track=q, language=lang)
 	
@@ -119,5 +215,6 @@ def main():
 			break
 	output.close()
 	print 'Extracting ' + emotion + ' tweets of ' + lang + ' has done.'
+	"""
 if __name__ == "__main__":
 	main()
