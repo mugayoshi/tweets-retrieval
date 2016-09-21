@@ -126,8 +126,8 @@ def obtainTweetsFromStream(twitter_api, q, lang, emotion):
 	tweets = make_twitter_request(twitter_stream.statuses.filter, **kw)
 	max_results = 1000#can be modified
 	
-	date = time.strftime("%d-%b-%Y-%H-%M")
-	file_name = "tweets-" + date + "-" + lang + "-" + emotion + "-from_stream.txt"#this text file should be moved to another directory
+	date = time.strftime("%d%b%Y%H%M")
+	file_name = "tweets_" + date + "_" + lang + "_" + emotion + "_from_stream.txt"#this text file should be moved to another directory
 	output = open(file_name, 'w')
 	
 	count = 0

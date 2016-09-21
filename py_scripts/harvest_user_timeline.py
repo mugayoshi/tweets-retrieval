@@ -121,9 +121,9 @@ def main():
 		quit()
 	account_name = argvs[1]
 #screen_name is basically userid (?)
-	date = time.strftime("%d-%b-%Y:%H:%M")
+	date = time.strftime("%d%b%Y%H%M")
 	lang = 'en'
-	file_name = "tweets-" + date + "-" + lang + "-"+ account_name + ".txt"#this text file should be moved to another directory
+	file_name = "tweets_" + date + "_" + lang + "_"+ account_name + ".txt"#this text file should be moved to another directory
 	output = open(file_name, 'w')
 
 	twitter_api = oauth_login()
