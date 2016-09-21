@@ -72,7 +72,7 @@ def make_twitter_request(twitter_api_func, max_errors=10, *args, **kw):
 				raise
 
 
-def harvest_user_timeline(twitter_api, screen_name = None, user_id = None, max_results = 1000):
+def harvest_user_timeline(twitter_api, screen_name = None, user_id = None, max_results = 10000):
 	assert (screen_name != None) != (user_id != None), "Must have screen_name or user_id, but not both"
 
 	kw = {'count': 200, 'trim_user': 'true', 'include_rts': 'true', 'since_id': 1}
@@ -115,7 +115,11 @@ def harvest_user_timeline(twitter_api, screen_name = None, user_id = None, max_r
 
 
 def main():
-	account_name = 'nytimes'#just for test.
+	argvs = sys.argv
+	if len(argvs) < 2:
+		print 'account name is required for this script.'
+		quit()
+	account_name = argvs[1]
 #screen_name is basically userid (?)
 	date = time.strftime("%d-%b-%Y:%H:%M")
 	lang = 'en'
@@ -132,7 +136,7 @@ def main():
 		output.write(s)
 #not really necessary 
 		count = count + 1
-		if count > 100:
+		if count > 1000:
 			break
 	output.close()
 if __name__ == "__main__":
