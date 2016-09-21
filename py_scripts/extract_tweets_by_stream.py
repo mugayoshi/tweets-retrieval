@@ -106,7 +106,7 @@ def main():
 	output = open(file_name, 'w')
 
 	count = 0
-	number_of_tweet = 1000
+	number_of_tweet = 5000
 	for tweet in stream:
 		txt = tweet['text']
 		if validateTweet(txt, emotion):
