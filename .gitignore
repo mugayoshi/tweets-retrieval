@@ -1,0 +1,8 @@
+# Virtual Env
+venv/
+
+# Emacs
+*~
+
+# Python
+*.pyc
