@@ -112,6 +112,17 @@ def harvest_user_timeline(twitter_api, screen_name = None, user_id = None, max_r
 
 	return results[:max_results]
 
+def validateTweet(tweet):
+	words = tweet.split(' ')
+	
+	for word in words:
+		if 'RT' in word:
+			return False
+		elif '@' in word:
+			return False
+	
+	return True
+
 
 
 def main():
@@ -123,14 +134,15 @@ def main():
 #screen_name is basically userid (?)
 	date = time.strftime("%d%b%Y%H%M")
 	lang = 'en'
-	file_name = "tweets_" + date + "_" + lang + "_"+ account_name + ".txt"#this text file should be moved to another directory
+	file_name = "tweets_" + date + "_" + lang + "_neu_"+ account_name + ".txt"#this text file should be moved to another directory
 	output = open(file_name, 'w')
 
 	twitter_api = oauth_login()
 	tweets = harvest_user_timeline(twitter_api, screen_name=account_name, max_results=200)
 	count = 0
 	for tweet in tweets:
-		#txt = tweet['text']
+		if not validateTweet(tweet['text']):
+			continue
 		s = json.dumps(tweet['text'], indent=1) + "\n"#need to modify !!
 		print tweet['text']
 		output.write(s)
@@ -139,5 +151,6 @@ def main():
 		if count > 1000:
 			break
 	output.close()
+	print 'Done. number of retrieved tweets are ' + str(count)
 if __name__ == "__main__":
 	main()
