@@ -6,3 +6,9 @@ venv/
 
 # Python
 *.pyc
+
+# Twitter
+streaming/credentials.py
+
+# Data
+data/
