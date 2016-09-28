@@ -7,4 +7,4 @@ class StdOutListener(StreamListener):
         return True
 
     def on_error(self, status):
-        print status
+        print "Error:", status
