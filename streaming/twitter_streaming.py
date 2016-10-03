@@ -11,9 +11,11 @@ if __name__ == '__main__':
     keywords = []
     if sys.argv[1:]:
         keywords = sys.argv[1:]
+        # [unicode(w, encoding='utf-8') for w in sys.argv[1:]]
     else:
-        print "No keywords received in argument. Exiting"
+        print("No keywords received in argument. Exiting")
         exit()
+    language = 'en'
     # Init Tweet stream
     listener = StdOutListener()
     auth = OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -21,6 +23,6 @@ if __name__ == '__main__':
     stream = Stream(auth, listener)
     
     # Stream search results into the console
-    stream.filter(track=keywords)
+    stream.filter(languages=[language],track=keywords)
 
     
