@@ -78,6 +78,3 @@ class Tweet:
         return ' '.join([t for t in tokens if t]).replace('rt @user : ','')
 
 
-# with io.open(outfile, 'w') as tweet_processed_text, io.open(infile, 'r') as fin:
-#     for line in fin:
-#         tweet_processed_text.write(preprocess(line.rstrip())+'\n')
