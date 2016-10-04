@@ -92,7 +92,7 @@ def harvest_user_timeline(twitter_api, screen_name = None, user_id = None, max_r
 	
 	results += tweets
 
-	print >> sys.stderr, 'Fetcghed %i tweets' % len(tweets)
+	print >> sys.stderr, 'Fetched %i tweets' % len(tweets)
 
 	page_num = 1
 
@@ -100,8 +100,8 @@ def harvest_user_timeline(twitter_api, screen_name = None, user_id = None, max_r
 		page_num = max_pages
 	
 	while page_num < max_pages and len(tweets) > 0 and len(results) < max_results:
-		kw[max_id] = min([ tweet['id'] for tweet in tweets]) - 1
-		tweets = make_twitter_requet(twitter_api.statuses.user_timeline, **kw)
+		kw['max_id'] = min([ tweet['id'] for tweet in tweets]) - 1
+		tweets = make_twitter_request(twitter_api.statuses.user_timeline, **kw)
 		results += tweets
 
 		print >> sys.stderr, 'Fetched %i tweets ' % (len(tweets),)
@@ -137,20 +137,21 @@ def main():
 	file_name = "tweets_" + date + "_" + lang + "_neu_"+ account_name + ".txt"#this text file should be moved to another directory
 	output = open(file_name, 'w')
 
+	num_retrieved_tweets = 2000
 	twitter_api = oauth_login()
-	tweets = harvest_user_timeline(twitter_api, screen_name=account_name, max_results=200)
+	tweets = harvest_user_timeline(twitter_api, screen_name=account_name, max_results=num_retrieved_tweets)
 	count = 0
 	for tweet in tweets:
 		if not validateTweet(tweet['text']):
 			continue
 		s = json.dumps(tweet['text'], indent=1) + "\n"#need to modify !!
-		print tweet['text']
+		#print tweet['text']
 		output.write(s)
 #not really necessary 
 		count = count + 1
-		if count > 1000:
+		if count > num_retrieved_tweets:
 			break
 	output.close()
-	print 'Done. number of retrieved tweets are ' + str(count)
+	print 'Done. number of retrieved tweets of ' + account_name + ' are ' + str(count)
 if __name__ == "__main__":
 	main()
