@@ -39,7 +39,8 @@ def validateTweet(tweet, emotion):
 		
 		if word in opposite_emotion:
 			print 'there is an emoticon of the oposite emotion in this tweet'
-			print tweet
+			print '-->' + tweet
+			print '--------------------------------'
 			return False
 	return True
 
