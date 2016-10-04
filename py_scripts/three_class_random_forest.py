@@ -104,20 +104,27 @@ def getFeatureVecsAndLabel(file_train_data, file_test_data):#for both training a
 	return (labels_train, feat_vec_train, labels_test, feat_vec_test)
 
 def main():
-	if len(sys.argv) < 2:
-		print 'please input a language'
+	if len(sys.argv) < 3:
+		print 'please input a language and target date to specify the training data file'
 		quit()
 	lang = sys.argv[1]
+	target_date = sys.argv[2]
 	data_path = '/home/nak/muga/twitter/data_for_test2/'
 	train_data = ''
 	test_data = ''
 	for f in os.listdir(data_path):
-		if f.endswith('.csv') and f.startswith('trainingdata'):
+		if f.endswith('.csv') and f.startswith('trainingdata') and target_date in f:
 			train_data = data_path + f
 		elif f.endswith('.csv') and 'merge' in f and lang in f:
 			test_data = data_path + f
 	print 'train data: ' + train_data
 	print 'test data: ' + test_data
+	
+	confirm = raw_input('it is going to process these files. is it okay ? (yes/no)' )
+	if confirm == 'no' or confirm == 'No':
+		print 'abort this program'
+		quit()
+	
 	classification(train_data, test_data) 
 
 if __name__ == "__main__":

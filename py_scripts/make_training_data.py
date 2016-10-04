@@ -110,12 +110,18 @@ def main():
 	for f in os.listdir(train_datas_path):
 		if not target_date == '' and target_date in f and emotion in f:
 			train_data_files.append(f)
+			print 'append ' + f 
 		elif target_date == '' and f.endswith('.txt') and emotion in f:
 			train_data_files.append(f)
 			print 'append ' + f 
 
 	if len(train_data_files) == 0:
 		print 'Not Found'
+		quit()
+	
+	confirm = raw_input('it is going to process these files. is it okay ? (yes/no)' )
+	if confirm == 'no' or confirm == 'No':
+		print 'abort this program'
 		quit()
 	
 	out_path = '/home/nak/muga/twitter/data_for_test2/'
