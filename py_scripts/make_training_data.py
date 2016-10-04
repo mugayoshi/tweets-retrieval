@@ -35,9 +35,9 @@ def writeToFile(lines_of_tweet, output_file, emotion):
 		if '~http' in tweet and emotion == 'neu':
 			tweet = tweet.replace('~http', '')
 			tweet = '"' + tweet + '"'
-			
+	
 		tweet = re.sub(r'[\"]{2,}', '\"', tweet)# this works as same as 'tweet = tweet.replace('\"\"', '\"')'
-
+		
 		tweet = re.sub(r'[\-]+', '', tweet)#eliminate hyphens
 		tweet = re.sub(r'[ ]{2,}', '', tweet)#eliminate 2 spaces in a tweet
 		tweet = re.sub(r'\\ud[a-zA-Z0-9]+', '', tweet) #remove a string such as '\ud***'
@@ -45,7 +45,7 @@ def writeToFile(lines_of_tweet, output_file, emotion):
 		tweet = re.sub(r'&amp;', '&', tweet)
 		#tweet = re.sub(r'[ ]$', '', tweet)#remove a space at the end of the sentence
 		tweet = re.sub(r'[ ]\"$', '\"', tweet)#remove a space at the end of the sentence
-
+			
 		line = '"' + str(sentiment_value) + '", ' + tweet + '\n'
 		output_file.write(line.encode('utf-8'))#necessary to encode otherwise cannot write strings
 		count += 1
