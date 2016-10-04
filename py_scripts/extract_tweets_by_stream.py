@@ -124,7 +124,7 @@ def obtainTweetsFromStream(twitter_api, q, lang, emotion):
 	kw['language'] = lang
 	twitter_stream = twitter.TwitterStream(auth=twitter_api.auth)
 	tweets = make_twitter_request(twitter_stream.statuses.filter, **kw)
-	max_results = 1000#can be modified
+	max_results = 10000#can be modified
 	
 	date = time.strftime("%d%b%Y%H%M")
 	file_name = "tweets_" + date + "_" + lang + "_" + emotion + "_from_stream.txt"#this text file should be moved to another directory
@@ -132,25 +132,32 @@ def obtainTweetsFromStream(twitter_api, q, lang, emotion):
 	
 	count = 0
 	for tweet in tweets:
-		txt = tweet['text']
+		if 'text' in tweet:
+			txt = tweet['text']
+		else:
+			break#goes outside of this for loop
 		if validateTweet(txt, emotion):
 			s = json.dumps(tweet['text'], indent=1) + "\n"
 			output.write(s)
 			count = count + 1
 			if count % 100 == 0:
-				print count + ': ' + txt
-	
+				print str(count) + ': ' + txt
+
 	print 'goes into the while loop'
-	while len(tweets) > 0 and count < max_results:
-		tweets = make_twitter_requet(twitter_stream.statuses.filter, **kw)
+	#while len(tweets) > 0 and count < max_results:
+	while count < max_results:
+		tweets = make_twitter_request(twitter_stream.statuses.filter, **kw)
 		for tweet in tweets:
-			txt = tweet['text']
+			if 'text' in tweet:
+				txt = tweet['text']
+			else:
+				break #goes outside of this for loop
 			if validateTweet(txt, emotion):
 				s = json.dumps(tweet['text'], indent=1) + "\n"
 				output.write(s)
 				count = count + 1
 				if count % 100 == 0:
-					print count + ': ' + txt
+					print str(count) + ': ' + txt
 	print 'goes out from the while loop'
 	output.close()
 	print 'Extracting ' + emotion + ' tweets of ' + lang + ' has done.'
