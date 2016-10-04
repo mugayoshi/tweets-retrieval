@@ -1,4 +1,5 @@
 import sys
+import io
 
 from tweepy.streaming import StreamListener
 
@@ -9,7 +10,9 @@ class Listener(StreamListener):
         self.count = 0    # How many tweets have been streamed
         self.max_count = max_count # max tweets to stream. 0 for infinite
         self.output_file = output_file
+        self.debug_file = io.open("data/debug.txt","w")
     def on_data(self, data):
+        print(data,file=self.debug_file)
         tweet = Tweet(data)
         t = tweet.preprocess()
         if t and tweet.isTagged():
