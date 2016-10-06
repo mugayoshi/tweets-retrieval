@@ -30,11 +30,11 @@ def make_twitter_request(twitter_api_func, max_errors=10, *args, **kw):
 			return None
 		elif e.e.code == 429:
 			print >> sys.stderr, 'encountered 429 error(Rate Limit Exceeded)'
-			if sleep_wait_when_limited:
+			if sleep_when_rate_limited:
 				print >> sys.stderr, 'Retrying in 15 minutes...zz....'
 				sys.stderr.flush()
 				time.sleep(60*15 + 5)
-				print >> sts.stderr, '.zzz.. Awake now and trying again.'
+				print >> sys.stderr, '.zzz.. Awake now and trying again.'
 				return 2
 			else:
 				raise e
@@ -137,20 +137,21 @@ def main():
 	file_name = "tweets_" + date + "_" + lang + "_neu_"+ account_name + ".txt"#this text file should be moved to another directory
 	output = open(file_name, 'w')
 
-	num_retrieved_tweets = 2000
+	num_retrieved_tweets = 15000
 	twitter_api = oauth_login()
 	tweets = harvest_user_timeline(twitter_api, screen_name=account_name, max_results=num_retrieved_tweets)
 	count = 0
-	for tweet in tweets:
-		if not validateTweet(tweet['text']):
-			continue
-		s = json.dumps(tweet['text'], indent=1) + "\n"#need to modify !!
-		#print tweet['text']
-		output.write(s)
-#not really necessary 
-		count = count + 1
-		if count > num_retrieved_tweets:
-			break
+	while count < num_retrieved_tweets:
+		for tweet in tweets:
+			if not validateTweet(tweet['text']):
+				continue
+			s = json.dumps(tweet['text'], indent=1) + "\n"#need to modify !!
+			output.write(s)
+			count = count + 1
+		#the end of the for loop
+
+		print 'count: ' + str(count) + '. it is going to another query.'
+		tweets = harvest_user_timeline(twitter_api, screen_name=account_name, max_results=num_retrieved_tweets)
 	output.close()
 	print 'Done. number of retrieved tweets of ' + account_name + ' are ' + str(count)
 if __name__ == "__main__":
