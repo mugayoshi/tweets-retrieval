@@ -15,7 +15,7 @@ def replaceURLAndUsername(tweet):
 	return tweet.decode('utf-8')
 
 def writeToFile(lines_of_tweet, output_file, emotion):
-	max_tweet = 1000
+	max_tweet = 100000
 	if emotion == 'pos':
 		sentiment_value = 0
 	elif emotion == 'neg':
@@ -93,18 +93,17 @@ def getEmoticonList(emotion):
 
 
 def main():
-	if len(sys.argv) < 3:
-		print 'the input must have emotion (pos, neg or neu) and output file name)'
+	if len(sys.argv) < 4:
+		print 'the input must have emotion (pos, neg or neu), output file name and target date of the text file)'
 		quit()
-	target_date = ''
-	if len(sys.argv) == 4:
-		target_date = sys.argv[3]
+	
 	emotion = sys.argv[1]#pos, neg, neu
 	file_name = sys.argv[2]
+	target_date = sys.argv[3]
 	if not emotion in ['pos', 'neg', 'neu']:
 		print emotion + ' is wrong for input'
 		quit()
-
+	
 	train_datas_path = '/home/nak/muga/twitter/py_scripts/tweets_from_stream/'
 	train_data_files = []
 	for f in os.listdir(train_datas_path):
@@ -119,7 +118,7 @@ def main():
 		print 'Not Found'
 		quit()
 	
-	confirm = raw_input('it is going to process these files. is it okay ? (yes/no)' )
+	confirm = raw_input('it is going to process these files. is it okay ? (yes/no) ' )
 	if confirm == 'no' or confirm == 'No':
 		print 'abort this program'
 		quit()
