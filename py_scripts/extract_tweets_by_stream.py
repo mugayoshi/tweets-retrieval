@@ -78,11 +78,11 @@ def make_twitter_request(twitter_api_func, max_errors=10, *args, **kw):
 			return None
 		elif e.e.code == 429:
 			print >> sys.stderr, 'encountered 429 error(Rate Limit Exceeded)'
-			if sleep_wait_when_limited:
+			if sleep_when_rate_limited:
 				print >> sys.stderr, 'Retrying in 15 minutes...zz....'
 				sys.stderr.flush()
 				time.sleep(60*15 + 5)
-				print >> sts.stderr, '.zzz.. Awake now and trying again.'
+				print >> sys.stderr, '.zzz.. Awake now and trying again.'
 				return 2
 			else:
 				raise e
@@ -125,7 +125,7 @@ def obtainTweetsFromStream(twitter_api, q, lang, emotion):
 	kw['language'] = lang
 	twitter_stream = twitter.TwitterStream(auth=twitter_api.auth)
 	tweets = make_twitter_request(twitter_stream.statuses.filter, **kw)
-	max_results = 10000#can be modified
+	max_results = 35000#can be modified
 	
 	date = time.strftime("%d%b%Y%H%M")
 	file_name = "tweets_" + date + "_" + lang + "_" + emotion + "_from_stream.txt"#this text file should be moved to another directory
