@@ -33,7 +33,7 @@ def classification(filename):
 		#out.write(pp.pprint(clf.best_estimator_))
 		print clf.best_estimator_
 
-		y_true, y_pred = label_test, clf.predict(feat_vec_test)
+		y_true, y_pred = label_test, clf.predict(data_test)
 		out.write(classification_report(y_true, y_pred))
 
 		print 'loop for ' + score + ' has done\n' 
