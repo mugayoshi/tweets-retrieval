@@ -127,17 +127,23 @@ def validateTweet(tweet):
 
 def main():
 	argvs = sys.argv
-	if len(argvs) < 2:
+	if len(argvs) < 3:
 		print 'account name is required for this script.'
 		quit()
 	account_name = argvs[1]
 #screen_name is basically userid (?)
 	date = time.strftime("%d%b%Y%H%M")
-	lang = 'en'
+	lang = argvs[2]
+	languages = ['en', 'fr', 'es', 'de', 'pt']
+	if not lang in languages:
+		print 'this language is not valid'
+		quit()
+	
+	out_file_path = "/home/nak/muga/twitter/tweets_from_stream"
 	file_name = "tweets_" + date + "_" + lang + "_neu_"+ account_name + ".txt"#this text file should be moved to another directory
-	output = open(file_name, 'w')
+	output = open(out_file_path + file_name, 'w')
 
-	num_retrieved_tweets = 15000
+	num_retrieved_tweets = 1500
 	twitter_api = oauth_login()
 	tweets = harvest_user_timeline(twitter_api, screen_name=account_name, max_results=num_retrieved_tweets)
 	count = 0
