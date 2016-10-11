@@ -125,11 +125,12 @@ def obtainTweetsFromStream(twitter_api, q, lang, emotion):
 	kw['language'] = lang
 	twitter_stream = twitter.TwitterStream(auth=twitter_api.auth)
 	tweets = make_twitter_request(twitter_stream.statuses.filter, **kw)
-	max_results = 35000#can be modified
+	max_results = 10000#can be modified
 	
 	date = time.strftime("%d%b%Y%H%M")
 	file_name = "tweets_" + date + "_" + lang + "_" + emotion + "_from_stream.txt"#this text file should be moved to another directory
-	output = open(file_name, 'w')
+	out_file_path = "/home/nak/muga/twitter/tweets_from_stream"
+	output = open(out_file_path + file_name, 'w')
 	
 	count = 0
 	for tweet in tweets:
@@ -198,7 +199,6 @@ def main():
 		print 'emotion ' + emotion + ' is incorrect'
 		quit()
 	
-	#lang = 'en'
 	twitter_api = oauth_login()
 	obtainTweetsFromStream(twitter_api, q, lang, emotion)
 	"""
