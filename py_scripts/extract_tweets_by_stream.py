@@ -2,6 +2,9 @@ import io, json
 import twitter
 import sys
 import time
+from urllib2 import URLError
+from httplib import BadStatusLine
+
 def oauth_login():
 	CONSUMER_KEY='yh0ltpdidxnb4y10h1zUOmz20'
 	CONSUMER_KEY_SECRET='XjJiiuHV7SWdYEUOuzTcFhLef0bmawoAJSisKM52pApd6gfWho'
@@ -201,28 +204,7 @@ def main():
 	
 	twitter_api = oauth_login()
 	obtainTweetsFromStream(twitter_api, q, lang, emotion)
-	"""
-	twitter_stream = twitter.TwitterStream(auth=twitter_api.auth)
-	stream = twitter_stream.statuses.filter(track=q, language=lang)
 	
-	date = time.strftime("%d-%b-%Y:%H:%M")
-	file_name = "tweets-" + date + "-" + lang + "-" + emotion + "-from_stream.txt"#this text file should be moved to another directory
-	output = open(file_name, 'w')
-
-	count = 0
-	number_of_tweet = 5000
-	for tweet in stream:
-		txt = tweet['text']
-		if validateTweet(txt, emotion):
-			s = json.dumps(tweet['text'], indent=1) + "\n"
-			output.write(s)
-			count = count + 1
-			if count % 100 == 0:
-				print txt
-		if count > number_of_tweet:
-			break
-	output.close()
-	print 'Extracting ' + emotion + ' tweets of ' + lang + ' has done.'
-	"""
+	
 if __name__ == "__main__":
 	main()
