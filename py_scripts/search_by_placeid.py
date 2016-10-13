@@ -7,9 +7,10 @@ import time
 def getPlaceID(city_name):
 
 	file_name = "place-id-" + city_name + ".txt"
-	file_path = os.getcwd() + "/txt_files/" + file_name
+	file_path = "/home/nak/muga/twitter/txt_files/" + file_name
 	#print file_path
 	if os.path.isfile(file_path) == False:
+		print file_path
 		print "this file doesn't exist"
 		quit()
 
@@ -17,7 +18,6 @@ def getPlaceID(city_name):
 	s = input.readline()
 
 	place_id_dict = {}
-
 	while s: #until the end of the file
 		splitted_line =  s.split(':')
 		place_id = splitted_line[0]
@@ -25,7 +25,6 @@ def getPlaceID(city_name):
 		place_name = splitted_line[2]
 		place_list = [place_fullname, place_name]
 		place_id_dict[place_id] = place_list
-#print s
 		s = input.readline()
 	return place_id_dict
 
@@ -41,7 +40,6 @@ def searchTweetByPlaceID(api, place_id, place_name):
 	search_results = api.search.tweets(q="place:%s" % place_id ,count=count, max_id=last_id, lang=lang)
 
 	results = search_results['statuses']
-
 	for _ in range(10000):
 		print "length of results: " + str(len(results)) + ' from ' + place_name[0] + place_name[1]
 		try:
@@ -67,17 +65,14 @@ def main():
 	twitter_api = twitter.Twitter(auth=auth)
 #    num_results = 500
 #open output file
-	date = time.strftime("%d-%b-%Y:%H:%M")
+	date = time.strftime("%d%b%Y%H%M")
 	argvs = sys.argv
 	if len(argvs) == 3:
 		city_name = argvs[1]
 		lang = argvs[2]
-		file_name = "tweets-" + date + "-" + lang + "-"+ city_name + ".txt"
-	elif len(argvs) == 2:
-		city_name = argvs[1]
-		file_name = "tweets-" + date + "-" + city_name + ".txt"
+		file_name = "tweets_" + date + "_" + lang + "_"+ city_name + ".txt"
 	else:
-		print 'please input city name and languange if necessary'
+		print 'please input city name and languange'
 		quit()
 		#file_name = "tweets-" + date + "-" + city_name + ".txt"
 	file_name = file_name.replace(' ', '')
