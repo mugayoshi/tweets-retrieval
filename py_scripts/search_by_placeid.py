@@ -63,7 +63,7 @@ def main():
 	auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET)
 
 	twitter_api = twitter.Twitter(auth=auth)
-#    num_results = 500
+	num_results = 100#this number is variable.
 #open output file
 	date = time.strftime("%d%b%Y%H%M")
 	argvs = sys.argv
@@ -76,29 +76,30 @@ def main():
 		quit()
 		#file_name = "tweets-" + date + "-" + city_name + ".txt"
 	file_name = file_name.replace(' ', '')
-	output = open(file_name, 'w')
+	out_file_path = "/home/nak/muga/twitter/tweets_from_stream"
+	output = open(out_file_path + file_name, 'w')
 
 #get place id
 	place_id_dict = getPlaceID(city_name)
-	for place in place_id_dict.keys():
-		place_name = place_id_dict[place]
-		results = searchTweetByPlaceID(twitter_api, place, place_name)
-		place_info = "------- " + place_name[0] + " -------\n"
+	retrieved_tweets = 0
+	while retrieved_tweets < num_results:
+		for place in place_id_dict.keys():
+			place_name = place_id_dict[place]
+			results = searchTweetByPlaceID(twitter_api, place, place_name)
+			place_info = "------- " + place_name[0] + " -------\n"
 
-		#output.write(place_info.decode('utf-8'))
-		output.write(place_info)
+			output.write(place_info)
 
-		if len(results) > 0:
-			for result in results:
-				#print json.dumps(result['text'], indent=1)
-				s = json.dumps(result['text'], indent=1) + "\n"#need to modify !!
-				#decode s as UTF-8 string
-				#output.write(s.decode('utf-8'))
-				output.write(s)
-		else:
-			print "no result from " + place_name[0] + place_name[1] 
-
+			if len(results) > 0:
+				for result in results:
+					s = json.dumps(result['text'], indent=1) + "\n"#need to modify !!
+					output.write(s)
+					retrieved_tweets += 1
+			else:
+				print "no result from " + place_name[0] + place_name[1] 
+	print 'goes out of the while loop'
 	output.close()
+	print str(retrieved_tweets) + ' are retrieved'
 
 if __name__ == "__main__":
 	main()
