@@ -54,6 +54,19 @@ def searchTweetByPlaceID(api, place_id, place_name):
 
 	return results
 
+def validateTweet(tweet):
+	words = tweet.split(' ')
+	for word in words:
+		if 'RT' in word:
+			return False
+		elif '@' in word:
+			return False
+		elif 'http' in word or 'http' in word:
+			return False
+		
+	return True
+
+
 def main():
 	CONSUMER_KEY='yh0ltpdidxnb4y10h1zUOmz20'
 	CONSUMER_KEY_SECRET='XjJiiuHV7SWdYEUOuzTcFhLef0bmawoAJSisKM52pApd6gfWho'
@@ -76,7 +89,7 @@ def main():
 		quit()
 		#file_name = "tweets-" + date + "-" + city_name + ".txt"
 	file_name = file_name.replace(' ', '')
-	out_file_path = "/home/nak/muga/twitter/tweets_from_stream"
+	out_file_path = "/home/nak/muga/twitter/py_scripts/tweets_from_searchAPI/"
 	output = open(out_file_path + file_name, 'w')
 
 #get place id
@@ -90,13 +103,15 @@ def main():
 
 			output.write(place_info)
 
-			if len(results) > 0:
-				for result in results:
-					s = json.dumps(result['text'], indent=1) + "\n"#need to modify !!
-					output.write(s)
-					retrieved_tweets += 1
-			else:
+			if len(results) == 0:
 				print "no result from " + place_name[0] + place_name[1] 
+				continue
+			for result in results:
+				s = json.dumps(result['text'], indent=1) + "\n"#need to modify !!
+				if validateTweet(s) == False:
+					continue
+				output.write(s)
+				retrieved_tweets += 1
 	print 'goes out of the while loop'
 	output.close()
 	print str(retrieved_tweets) + ' are retrieved'
