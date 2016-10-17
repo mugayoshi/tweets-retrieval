@@ -104,7 +104,7 @@ def main():
 		print emotion + ' is wrong for input'
 		quit()
 	
-	train_datas_path = '/muga/txt_files/tweets_from_stream/'
+	train_datas_path = '/home/muga/twitter/tweets_from_stream/smalldata/'
 	train_data_files = []
 	for f in os.listdir(train_datas_path):
 		if not target_date == '' and target_date in f and emotion in f:
@@ -123,12 +123,12 @@ def main():
 		print 'abort this program'
 		quit()
 	
-	out_path = '/muga/txt_files/test_data/'
+	out_path = '/home/muga/twitter/test_data/smalldata/'
 	date = time.strftime("%d%b%Y%H%M")
 	output_file = open(out_path + date + emotion + '_' + file_name, 'wb')
 	
 	for f in train_data_files:
-		input_file = open('/home/nak/muga/twitter/py_scripts/tweets_from_stream/' + f)
+		input_file = open('/home/muga/twitter/tweets_from_stream/smalldata/' + f)
 		lines_of_tweet = input_file.readlines()
 		#validate each sentence again.
 		#in neutral tweets (news accounts) each tweet has URL therefore the URLs should be removed.

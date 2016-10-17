@@ -19,7 +19,7 @@ def classification(filename_train, filename_test):
 	date = time.strftime('%d%b%Y%H%M')
 	#out_file_name = filename_train.split('_')[0] + '_3class__result_' + date + '.txt'
 	out_file_name = filename_train.split('/')[-1].split('.')[0] + '_3class_result_' + date + '.txt'
-	out_file_path = "/home/nak/muga/twitter/classification_result/" + out_file_name #it is assumed this script is executed at twitter directory
+	out_file_path = "/home/muga/twitter/classification_result/" + out_file_name #it is assumed this script is executed at twitter directory
 
 	out = open(out_file_path, 'a')
 	for score in scores:
@@ -109,11 +109,11 @@ def main():
 		quit()
 	lang = sys.argv[1]
 	target_date = sys.argv[2]
-	data_path = '/home/nak/muga/twitter/data_for_test2/'
+	data_path = '/home/muga/twitter/test_data/'
 	train_data = ''
 	test_data = ''
 	for f in os.listdir(data_path):
-		if f.endswith('.csv') and f.startswith('trainingdata') and target_date in f:
+		if f.endswith('.csv') and f.startswith('trainingdata') and target_date in f and lang in f:
 			train_data = data_path + f
 		elif f.endswith('.csv') and 'merge' in f and lang in f:
 			test_data = data_path + f

@@ -28,7 +28,7 @@ def main():
 		place_id_dict[place_id] = place_list
 	file_name = file_name.replace(' ', '')
 	file_name = "placeid_" + cityname + "_" + granularity + ".txt"
-	out_file_path = "/muga/txt_files/place_id_data/"
+	out_file_path = "/home/muga/twitter/place_id_data/"
 	output = open(out_file_path + file_name, 'w')
 
 	for p_id in place_id_dict:

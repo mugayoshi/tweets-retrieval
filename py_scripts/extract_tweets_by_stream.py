@@ -132,7 +132,7 @@ def obtainTweetsFromStream(twitter_api, q, lang, emotion):
 	
 	date = time.strftime("%d%b%Y%H%M")
 	file_name = "tweets_" + date + "_" + lang + "_" + emotion + "_from_stream.txt"#this text file should be moved to another directory
-	out_file_path = "/muga/txt_files/tweets_from_stream/"
+	out_file_path = "/home/muga/twitter/tweets_from_stream/"
 	output = open(out_file_path + file_name, 'w')
 	
 	count = 0

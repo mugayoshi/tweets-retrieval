@@ -5,7 +5,7 @@ import json
 import time
 
 def getPlaceID(city_name):
-	data_path = '/muga/txt_files/place_id_data/'
+	data_path = '/home/muga/twitter/place_id_data/'
 	file_name = ''
 	print 'city name: ' + city_name
 	for f in os.listdir(data_path):
@@ -90,7 +90,7 @@ def main():
 		quit()
 		#file_name = "tweets-" + date + "-" + city_name + ".txt"
 	file_name = file_name.replace(' ', '')
-	out_file_path = "/muga/txt_files/tweets_from_searchAPI/"
+	out_file_path = "/home/muga/twitter/tweets_from_searchAPI/"
 	output = open(out_file_path + file_name, 'w')
 
 #get place id

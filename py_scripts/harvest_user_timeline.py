@@ -139,7 +139,7 @@ def main():
 		print 'this language is not valid'
 		quit()
 	
-	out_file_path = "/muga/txt_files/tweets_from_stream/"
+	out_file_path = "/home/muga/twitter/tweets_from_stream/"
 	file_name = "tweets_" + date + "_" + lang + "_neu_"+ account_name + ".txt"#this text file should be moved to another directory
 	output = open(out_file_path + file_name, 'w')
 
