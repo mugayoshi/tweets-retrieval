@@ -5,15 +5,8 @@ import sys
 # from RegularExpressions import 
 
 class Tweet:
-    def __init__(self, t):
-        try:
-            self.raw = json.loads(t)['text']
-        except KeyError:
-            if 'limit' in json.loads(t):
-                print("Error: Download limit reached")
-            else: print("No limit key ? weird...")
-            raise
-        self.content = self.raw
+    def __init__(self, content):
+        self.content = content
         self.tokens_re = self.compile_re()
         self.tokens = self.tokenize()
         self.hashtags = []
