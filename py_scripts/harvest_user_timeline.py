@@ -139,11 +139,11 @@ def main():
 		print 'this language is not valid'
 		quit()
 	
-	out_file_path = "/home/nak/muga/twitter/tweets_from_stream"
+	out_file_path = "/muga/txt_files/tweets_from_stream/"
 	file_name = "tweets_" + date + "_" + lang + "_neu_"+ account_name + ".txt"#this text file should be moved to another directory
 	output = open(out_file_path + file_name, 'w')
 
-	num_retrieved_tweets = 1500
+	num_retrieved_tweets = 300
 	twitter_api = oauth_login()
 	tweets = harvest_user_timeline(twitter_api, screen_name=account_name, max_results=num_retrieved_tweets)
 	count = 0
