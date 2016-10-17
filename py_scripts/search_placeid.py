@@ -26,10 +26,8 @@ def main():
 		place_id = place['id']
 		place_list = [place_full_name, place_name]
 		place_id_dict[place_id] = place_list
-	if not granularity == 'city':
-		file_name = "placeid_" + cityname + "_" + granularity + ".txt"
-	else:
-		file_name = "placeid_" + cityname + ".txt"
+	file_name = file_name.replace(' ', '')
+	file_name = "placeid_" + cityname + "_" + granularity + ".txt"
 	out_file_path = "/muga/txt_files/place_id_data/"
 	output = open(out_file_path + file_name, 'w')
 
