@@ -1,0 +1,129 @@
+from sklearn.ensemble import RandomForestClassifier
+import csv
+from sklearn.grid_search import GridSearchCV
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.svm import SVC
+from sklearn.cross_validation import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics import precision_score, recall_score, f1_score
+import os
+import sys
+import time
+
+def classification(filename_data_mine, filename_data_others):
+	labels, feature_vec = getFeatureVecsAndLabel(filename_data_mine, filename_data_others)
+	data_train, data_test, label_train, label_test = train_test_split(feature_vec, labels, test_size=0.2)
+	print 'data extraction has done'
+	scores = ['accuracy', 'precision', 'recall']
+
+	date = time.strftime('%d%b%Y%H%M')
+	#out_file_name = filename_train.split('_')[0] + '_3class__result_' + date + '.txt'
+	out_file_name = filename_data_mine.split('/')[-1].split('.')[0] + '_3class_merge_' + date + '.txt'
+	out_file_path = "/home/muga/twitter/classification_result/" + out_file_name #it is assumed this script is executed at twitter directory
+
+	out = open(out_file_path, 'a')
+	for score in scores:
+		out.write('\n' + '-'*50)
+		out.write(score)
+		out.write('-'*50)
+		tuned_parameters = [{'n_estimators': [10, 30, 50, 70, 90, 110, 130, 150], 'max_features':['auto', 'sqrt', 'log2', None]}]
+		clf = GridSearchCV(RandomForestClassifier(), param_grid=tuned_parameters, cv=3, scoring=score, n_jobs=-1)
+		clf.fit(data_train, label_train)
+		#out.write(pp.pprint(clf.best_estimator_))
+		print clf.best_estimator_
+
+		y_true, y_pred = label_test, clf.predict(data_test)
+		out.write(classification_report(y_true, y_pred))
+
+		print 'loop for ' + score + ' has done\n' 
+	
+	out.close()
+	print "classification of " + filename_data_mine + " has done" 
+	return
+
+def extractTweetAndLabelForMyData(filename):#from spanish data version
+	input_file = open(filename, 'rb')
+	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
+	labels = []
+	data = []
+	header = next(csv_reader)
+	for row in csv_reader:
+		try:
+			row[1].decode('utf-8', 'strict') #depends on file
+		except:
+			continue
+		data.append(row[1]) #depends on file
+		if row[0] == "2": #neutral
+			labels.append(2)
+		elif row[0] == "1": #negative
+			labels.append(1)
+		elif row[0] == "0": #positive
+			labels.append(0)
+	
+	return (labels, data)
+
+
+def extractTweetAndLabelForOthersData(filename):
+	input_file = open(filename, 'rb')
+	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
+	labels = []
+	data = []
+	non_utf_8 = 0
+	header = next(csv_reader)
+	for row in csv_reader:
+		try:
+			row[4].decode('utf-8', 'strict') #depends on file
+		except:
+			#print str(i) + ' ' + row[5] + ' contains non-utf-8 character'
+			non_utf_8 = non_utf_8 + 1
+			continue
+		if row[1] == "3": #n/a isn't necessary in this script
+			continue
+		elif row[1] == "2": #neutral
+			labels.append(2)
+		elif row[1] == "1": #negative
+			labels.append(1)
+		elif row[1] == "0": #positive
+			labels.append(0)
+		data.append(row[4]) #depends on file
+	#end of the for loop
+	return (labels, data)
+
+def getFeatureVecsAndLabel(file_mine_data, file_others_data):#for both training and test data
+	#generate a matrix of token counts
+	labels_mine, tweets_mine = extractTweetAndLabelForMyData(file_mine_data)
+	labels_others, tweets_others = extractTweetAndLabelForOthersData(file_others_data)
+	
+	labels = labels_mine + labels_others
+	tweets = tweets_mine + tweets_others
+	count_vectorizer = CountVectorizer()
+	feat_vec = count_vectorizer.fit_transform(tweets)
+
+	return (labels, feat_vec)
+
+def main():
+	if len(sys.argv) < 3:
+		print 'please input a language and target date to specify the training data file'
+		quit()
+	lang = sys.argv[1]
+	target_date = sys.argv[2]
+	data_path = '/home/muga/twitter/test_data/'
+	my_data = ''
+	others_data = ''
+	for f in os.listdir(data_path):
+		if f.endswith('.csv') and f.startswith('trainingdata') and target_date in f and lang in f:
+			my_data = data_path + f
+		elif f.endswith('.csv') and 'merge' in f and lang in f:
+			others_data = data_path + f
+	print 'my data: ' + my_data
+	print 'others data: ' + others_data
+	
+	confirm = raw_input('it is going to process these files. is it okay ? (yes/no)' )
+	if confirm == 'no' or confirm == 'No':
+		print 'abort this program'
+		quit()
+	
+	classification(my_data, others_data) 
+
+if __name__ == "__main__":
+	main()

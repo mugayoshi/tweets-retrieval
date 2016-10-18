@@ -30,11 +30,11 @@ def make_twitter_request(twitter_api_func, max_errors=10, *args, **kw):
 			return None
 		elif e.e.code == 429:
 			print >> sys.stderr, 'encountered 429 error(Rate Limit Exceeded)'
-			if sleep_wait_when_limited:
+			if sleep_when_rate_limited:
 				print >> sys.stderr, 'Retrying in 15 minutes...zz....'
 				sys.stderr.flush()
 				time.sleep(60*15 + 5)
-				print >> sts.stderr, '.zzz.. Awake now and trying again.'
+				print >> sys.stderr, '.zzz.. Awake now and trying again.'
 				return 2
 			else:
 				raise e
@@ -92,7 +92,7 @@ def harvest_user_timeline(twitter_api, screen_name = None, user_id = None, max_r
 	
 	results += tweets
 
-	print >> sys.stderr, 'Fetcghed %i tweets' % len(tweets)
+	print >> sys.stderr, 'Fetched %i tweets' % len(tweets)
 
 	page_num = 1
 
@@ -100,8 +100,8 @@ def harvest_user_timeline(twitter_api, screen_name = None, user_id = None, max_r
 		page_num = max_pages
 	
 	while page_num < max_pages and len(tweets) > 0 and len(results) < max_results:
-		kw[max_id] = min([ tweet['id'] for tweet in tweets]) - 1
-		tweets = make_twitter_requet(twitter_api.statuses.user_timeline, **kw)
+		kw['max_id'] = min([ tweet['id'] for tweet in tweets]) - 1
+		tweets = make_twitter_request(twitter_api.statuses.user_timeline, **kw)
 		results += tweets
 
 		print >> sys.stderr, 'Fetched %i tweets ' % (len(tweets),)
@@ -112,32 +112,53 @@ def harvest_user_timeline(twitter_api, screen_name = None, user_id = None, max_r
 
 	return results[:max_results]
 
+def validateTweet(tweet):
+	words = tweet.split(' ')
+	
+	for word in words:
+		if 'RT' in word:
+			return False
+		elif '@' in word:
+			return False
+	
+	return True
+
 
 
 def main():
 	argvs = sys.argv
-	if len(argvs) < 2:
+	if len(argvs) < 3:
 		print 'account name is required for this script.'
 		quit()
 	account_name = argvs[1]
 #screen_name is basically userid (?)
 	date = time.strftime("%d%b%Y%H%M")
-	lang = 'en'
-	file_name = "tweets_" + date + "_" + lang + "_"+ account_name + ".txt"#this text file should be moved to another directory
-	output = open(file_name, 'w')
+	lang = argvs[2]
+	languages = ['en', 'fr', 'es', 'de', 'pt']
+	if not lang in languages:
+		print 'this language is not valid'
+		quit()
+	
+	out_file_path = "/home/muga/twitter/tweets_from_stream/"
+	file_name = "tweets_" + date + "_" + lang + "_neu_"+ account_name + ".txt"#this text file should be moved to another directory
+	output = open(out_file_path + file_name, 'w')
 
+	num_retrieved_tweets = 300
 	twitter_api = oauth_login()
-	tweets = harvest_user_timeline(twitter_api, screen_name=account_name, max_results=200)
+	tweets = harvest_user_timeline(twitter_api, screen_name=account_name, max_results=num_retrieved_tweets)
 	count = 0
-	for tweet in tweets:
-		#txt = tweet['text']
-		s = json.dumps(tweet['text'], indent=1) + "\n"#need to modify !!
-		print tweet['text']
-		output.write(s)
-#not really necessary 
-		count = count + 1
-		if count > 1000:
-			break
+	while count < num_retrieved_tweets:
+		for tweet in tweets:
+			if not validateTweet(tweet['text']):
+				continue
+			s = json.dumps(tweet['text'], indent=1) + "\n"#need to modify !!
+			output.write(s)
+			count = count + 1
+		#the end of the for loop
+
+		print 'count: ' + str(count) + '. it is going to another query.'
+		tweets = harvest_user_timeline(twitter_api, screen_name=account_name, max_results=num_retrieved_tweets)
 	output.close()
+	print 'Done. number of retrieved tweets of ' + account_name + ' are ' + str(count)
 if __name__ == "__main__":
 	main()
