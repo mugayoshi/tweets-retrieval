@@ -1,0 +1,15 @@
+# Virtual Env
+venv/
+
+# Emacs
+*~
+
+# Python
+*.pyc
+
+# Twitter
+streaming/credentials.py
+credentials.py
+
+# Data
+data/
