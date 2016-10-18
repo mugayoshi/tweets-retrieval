@@ -10,6 +10,6 @@ venv/
 # Twitter
 streaming/credentials.py
 credentials.py
-
+py_scripts/credentils.py
 # Data
 data/
