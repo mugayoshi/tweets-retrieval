@@ -1,7 +1,16 @@
 import twitter
 import json
-
+import sys
 from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
+def validate_area(country, searched):
+	if searched == 'US':
+		searched = 'United States'
+	elif searched == 'UK':
+		searched = 'United Kingdom'
+	if country == searched:
+		return True
+	else:
+		return False
 def main():
 	auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET)
 
@@ -11,7 +20,11 @@ def main():
 	cityname = raw_input()
 	print "granularity (poi, neighborhood, city, admin, country) = ",
 	granularity = raw_input()
-
+	argvs = sys.argv
+	searched_country = ''
+	if len(argvs) == 2:
+		searched_country = argvs[1]
+		
 	result = twitter_api.geo.search(query=cityname, granularity=granularity)
 
 	places = result['result']['places']
@@ -20,6 +33,10 @@ def main():
 		place_full_name = place['full_name']
 		place_name = place['name']
 		place_id = place['id']
+		country = place['country']
+		if searched_country and validate_area(country, searched_country) == False:
+			print 'fullname: ' + place_full_name + ', country: ' + country
+			continue
 		place_list = [place_full_name, place_name]
 		place_id_dict[place_id] = place_list
 	file_name = "placeid_" + cityname + "_" + granularity + ".txt"
