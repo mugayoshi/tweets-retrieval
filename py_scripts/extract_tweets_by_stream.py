@@ -5,12 +5,8 @@ import time
 from urllib2 import URLError
 from httplib import BadStatusLine
 
+from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
 def oauth_login():
-	CONSUMER_KEY='yh0ltpdidxnb4y10h1zUOmz20'
-	CONSUMER_KEY_SECRET='XjJiiuHV7SWdYEUOuzTcFhLef0bmawoAJSisKM52pApd6gfWho'
-	OAUTH_TOKEN='574115777-FpPvFcducoKtQLrNGrnIUh7BgKKcciUoa8En9L5Q'
-	OAUTH_TOKEN_SECRET='8owLiHDqv8YplH5zriQ4MO0x5QocPT4ywpDtFNK34OV6W'
-
 	auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET)
 
 	twitter_api = twitter.Twitter(auth=auth)
@@ -128,7 +124,7 @@ def obtainTweetsFromStream(twitter_api, q, lang, emotion):
 	kw['language'] = lang
 	twitter_stream = twitter.TwitterStream(auth=twitter_api.auth)
 	tweets = make_twitter_request(twitter_stream.statuses.filter, **kw)
-	max_results = 2000#can be modified
+	max_results = 200#can be modified
 	
 	date = time.strftime("%d%b%Y%H%M")
 	file_name = "tweets_" + date + "_" + lang + "_" + emotion + "_from_stream.txt"#this text file should be moved to another directory
