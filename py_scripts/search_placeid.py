@@ -1,12 +1,8 @@
 import twitter
 import json
 
+from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
 def main():
-	CONSUMER_KEY='yh0ltpdidxnb4y10h1zUOmz20'
-	CONSUMER_KEY_SECRET='XjJiiuHV7SWdYEUOuzTcFhLef0bmawoAJSisKM52pApd6gfWho'
-	OAUTH_TOKEN='574115777-FpPvFcducoKtQLrNGrnIUh7BgKKcciUoa8En9L5Q'
-	OAUTH_TOKEN_SECRET='8owLiHDqv8YplH5zriQ4MO0x5QocPT4ywpDtFNK34OV6W'
-
 	auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET)
 
 	twitter_api = twitter.Twitter(auth=auth)
@@ -26,8 +22,8 @@ def main():
 		place_id = place['id']
 		place_list = [place_full_name, place_name]
 		place_id_dict[place_id] = place_list
-	file_name = file_name.replace(' ', '')
 	file_name = "placeid_" + cityname + "_" + granularity + ".txt"
+	file_name = file_name.replace(' ', '')
 	out_file_path = "/home/muga/twitter/place_id_data/"
 	output = open(out_file_path + file_name, 'w')
 
