@@ -18,7 +18,7 @@ def search(query, lang, output, max_count=100):
 
 	#print("QUERY:[",query,"]", "OUTPUT:", output_file.name, file=output_file)
 	retrieved_tweets = 0
-	for result in Cursor(api.search, q=query, lang=lang).items(max_count):
+	for result in Cursor(api.search, q=query, lang=lang, retry_count=5, retry_delay=5).items(max_count):
 		s = result.text + "\n"
 		if validateTweet(s) == False:
 			continue
@@ -30,11 +30,11 @@ def search(query, lang, output, max_count=100):
 def getPlaceID(city_name):
 	data_path = '/home/muga/twitter/place_id_data/'
 	file_name = ''
-	print 'city name: ' + city_name
+	#print 'city name: ' + city_name
 	for f in os.listdir(data_path):
 		if city_name in f and f.endswith('txt') and 'city' in f:#for now specifies only 'city'
 			file_name = data_path + f
-			print 'file_name: ' + file_name
+			#print 'file_name: ' + file_name
 			break
 	if len(file_name) == 0:
 		print 'The Input File is not Found. Abort'
@@ -85,10 +85,10 @@ def main():
 		quit()
 		#file_name = "tweets-" + date + "-" + city_name + ".txt"
 	file_name = file_name.replace(' ', '')
-	out_file_path = '/home/muga/twitter/tweets_from_searchAPI/'
+	out_file_path = '/home/muga/twitter/tweets_from_searchAPI/tweepy/'
 	output = open(out_file_path + file_name, 'w')
 
-	num_results = 100
+	num_results = 2000
 	start_time = datetime.now()
 
 	place_id_dict = getPlaceID(city_name)
@@ -99,7 +99,8 @@ def main():
 			place_name = place_id_dict[place]
 			q = "place:%s" % place 
 			query = get_query(q)
-			place_info = "------- " + place_name[0] + " -------\n"
+			current_time = datetime.now()
+			place_info = "------- " + place_name[0] + "at " + datetime.strftime(current_time, '%H:%M:%S on %d/%b/%Y') + " -------\n"
 			output.write(place_info)
 
 			retrieved_tweets += search(query, lang, output)#!!!! search function returns the number of the retrieved tweets
@@ -108,9 +109,11 @@ def main():
 	#the end of the while loop
 
 	print 'goes out of the while loop'
-	output.close()
 	print str(retrieved_tweets) + ' are retrieved'
 	end_time = datetime.now()
-	print 'Execution time:%s' % (end_time - start_time)
+	exec_time = 'Execution time:%s' % (end_time - start_time)
+	print exec_time
+	output.write('\n\n\n' + exec_time + '\n')
+	output.close()
 if __name__ == '__main__':
 	main()
