@@ -36,10 +36,10 @@ class Dataset:
         Shuffle dataset and drops duplicates
         '''
         self.load(dataset)
-        # http://stackoverflow.com/questions/29576430/shuffle-dataframe-rows
         self.data = self.data.drop_duplicates()
         self.data = self.data.sample(frac=1).reset_index(drop=True)
         self.data.to_csv(self.path.format(dataset,self.ext), sep='\t', header=False, index=False)
+        print(type(self.data))
         self.data = None
     
     def split(self,train_ratio=0.75):

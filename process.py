@@ -1,5 +1,3 @@
-import io
-import random
 from os import path
 
 from dataset import Dataset
@@ -10,11 +8,11 @@ if __name__ == "__main__":
 
     # Dataset creation
     d = Dataset(dataset_path, dataset_name)
-    # d.join(path.join(data_path,data_name))
-    # print("Total Length:", len(d))
+    d.join(path.join(data_path,data_name))
+    print("Total Length:", len(d))
 
-    # # Dataset manipulation
-    # d.shuffle()
+    # Dataset manipulation
+    d.shuffle()
     d.split(0.67)
     d.kfold_split(10)
     print("Total Length:", len(d))
