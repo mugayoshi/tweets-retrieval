@@ -10,7 +10,7 @@ from tweepy import Cursor
 from tweet import Tweet
 from credentials import ACCESS_TOKEN, ACCESS_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_SECRET
 
-def search(query, output_file, debug_file,
+def search(query, output_file=sys.stdout, debug_file=None,
            lang="en",
            geocode="",
            max_count=500000):
@@ -26,7 +26,7 @@ def search(query, output_file, debug_file,
     for result in Cursor(api.search,
                          q=query,
                          lang=lang).items(max_count):
-        print(result.text+"\n", file=debug_file)
+        if debug_file: print(result.text+"\n", file=debug_file)
         tweet = Tweet(result.text)
         t = tweet.preprocess()
         if t and tweet.isTagged():
@@ -48,20 +48,14 @@ def get_query(keywords,
     return q
 
 if __name__ == '__main__':
-    # keywords = sys.argv[1:]
-    # output_path = "data/" + "_".join(keywords) + ".txt"
-    # with io.open(output_path, 'w') as output_file:
-    #    streaming.stream(keywords,language='en',output_file=output_file,max_count=10000)
-    
-    # q = input("Search for:")
     keywords = ["book", "trump", "flight", "hello", "design", "google", "nexus", "game", "ps4", "xbox", "clinton", "bye", "true", "ddos", "got", "snow", "apple", "iphone", "morning", "makeup", "technology"]
+    keywords = ["sarkozy","lepen","hollande","2017"]
     q = get_query(keywords)
     output_path = "/home/local/data/stream_output.txt"
     debug_path = "/home/local/data/debug.txt"
     start_time = datetime.now()
     with io.open(output_path, 'w') as f, io.open(debug_path, 'w') as g:
         search(q,f,g)
-    search(q,sys.stdout)
     end_time = datetime.now()
     print("Execution time:", end_time - start_time)
 
