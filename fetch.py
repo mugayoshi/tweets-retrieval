@@ -1,5 +1,4 @@
 import sys
-import io
 from datetime import datetime
 
 from tweepy import API
@@ -8,9 +7,10 @@ from tweepy import Stream
 from tweepy import Cursor
 
 from tweet import Tweet
+from query import get_query
 from credentials import ACCESS_TOKEN, ACCESS_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_SECRET
 
-def search(query, output_file=sys.stdout, debug_file=None,
+def fetch(query, output_file=sys.stdout, debug_file=None,
            lang="en",
            geocode="",
            max_count=500000):
@@ -36,26 +36,14 @@ def search(query, output_file=sys.stdout, debug_file=None,
         if count % 1000 == 0: print("tweets saved:", ok_count, "/", count)
     print("Loop end:", ok_count, "/", count, "tweets saved")
 
-def get_query(keywords,
-           retweets=False,
-           since="",
-           until="",
-           geocode="",):
-    q = " OR ".join(keywords)
-    q += ("" if retweets else " -filter:retweets")
-    q += (" since:" + since if since else "")
-    q += (" until:" + until if until else "")
-    return q
-
 if __name__ == '__main__':
     keywords = ["book", "trump", "flight", "hello", "design", "google", "nexus", "game", "ps4", "xbox", "clinton", "bye", "true", "ddos", "got", "snow", "apple", "iphone", "morning", "makeup", "technology"]
-    keywords = ["sarkozy","lepen","hollande","2017"]
     q = get_query(keywords)
     output_path = "/home/local/data/stream_output.txt"
     debug_path = "/home/local/data/debug.txt"
     start_time = datetime.now()
-    with io.open(output_path, 'w') as f, io.open(debug_path, 'w') as g:
-        search(q,f,g)
+    with open(output_path, 'w') as f, open(debug_path, 'w') as g:
+        fetch(q,f,g)
     end_time = datetime.now()
     print("Execution time:", end_time - start_time)
 
