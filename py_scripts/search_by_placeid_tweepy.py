@@ -19,10 +19,11 @@ def search(query, lang, output, max_count=100):
 	#print("QUERY:[",query,"]", "OUTPUT:", output_file.name, file=output_file)
 	retrieved_tweets = 0
 	for result in Cursor(api.search, q=query, lang=lang, retry_count=5, retry_delay=5).items(max_count):
-		s = result.text + "\n"
+		s = result.text
 		if validateTweet(s) == False:
 			continue
-		output.write(s.encode('utf-8'))
+		created_time = datetime.strftime(result.created_at, '%H:%M:%S on %d/%b/%Y')
+		output.write(s.encode('utf-8') + ', ' + created_time.encode('utf-8') + '\n')
 		retrieved_tweets += 1
 
 	return retrieved_tweets
@@ -76,19 +77,19 @@ def get_query(q, retweets=False, since="", until="", geocode="",):
 def main():
 	date = time.strftime("%d%b%Y%H%M")
 	argvs = sys.argv
-	if len(argvs) == 3:
+	if len(argvs) == 4:
 		city_name = argvs[1]
 		lang = argvs[2]
 		file_name = "tweets_" + date + "_" + lang + "_"+ city_name + ".txt"
+		num_results = int(argvs[3])#argumets from command line are initially string type !!!!
 	else:
-		print 'please input city name and languange'
+		print 'please input city name, languange and number of retrieved tweets'
 		quit()
 		#file_name = "tweets-" + date + "-" + city_name + ".txt"
 	file_name = file_name.replace(' ', '')
 	out_file_path = '/home/muga/twitter/tweets_from_searchAPI/tweepy/'
 	output = open(out_file_path + file_name, 'w')
 
-	num_results = 2000
 	start_time = datetime.now()
 
 	place_id_dict = getPlaceID(city_name)
@@ -100,12 +101,12 @@ def main():
 			q = "place:%s" % place 
 			query = get_query(q)
 			current_time = datetime.now()
-			place_info = "------- " + place_name[0] + "at " + datetime.strftime(current_time, '%H:%M:%S on %d/%b/%Y') + " -------\n"
+			place_info = "\n------- " + place_name[0] + "at " + datetime.strftime(current_time, '%H:%M:%S on %d/%b/%Y') + " -------\n"
 			output.write(place_info)
 
 			retrieved_tweets += search(query, lang, output)#!!!! search function returns the number of the retrieved tweets
 		#the end of the for loop for each place
-		print str(retrieved_tweets) + ' have been retrieved until now.'
+		print str(retrieved_tweets) + ' have been retrieved until now. out of ' + str(num_results)
 	#the end of the while loop
 
 	print 'goes out of the while loop'
