@@ -7,9 +7,9 @@ venv/
 # Python
 *.pyc
 
-# Twitter
-streaming/credentials.py
-credentials.py
+# iPython Notebook
+.ipynb_checkpoints/
+*.ipynb
 
-# Data
-data/
+# Settings
+settings.py
