@@ -2,6 +2,7 @@ import twitter
 import json
 import sys
 from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
+import os
 def validate_area(country, searched):
 	if searched == 'US':
 		searched = 'United States'
@@ -54,17 +55,22 @@ def main():
 			continue
 		place_list = [place_full_name, place_name]
 		place_id_dict[place_id] = place_list
-		
+
 	if latitude and longtitude:
+		out_file_path = "/home/muga/twitter/place_id_data/"
 		area_range = accuracy / 1000 #km
 		file_name = "placeid_" + latitude + "_" + longtitude + "_" + str(area_range) + "km_"+ ".txt"
 	else:
+		out_file_path = "/home/muga/twitter/place_id_data/" + cityname + "/"
 		if granularity:
 			file_name = "placeid_" + cityname + "_" + granularity + ".txt"
 		else:
-			file_name = "placeid_" + cityname + ".txt"
+			file_name = "placeid_" + cityname + "_keyword_search.txt"
+
 	file_name = file_name.replace(' ', '')
-	out_file_path = "/home/muga/twitter/place_id_data/"
+	if os.path.isdir(out_file_path) == False:
+		print 'city name is wrong'
+		quit()
 	output = open(out_file_path + file_name, 'w')
 
 	output.write('city name: ' + cityname + ', granularity: ' + granularity + ', latitude: ' + latitude + ', longtitude: ' + longtitude + "\n")
