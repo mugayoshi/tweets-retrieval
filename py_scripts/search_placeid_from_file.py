@@ -78,9 +78,9 @@ def main():
 	count_invoke = 0
 	out_file_path = "/home/muga/twitter/place_id_data/" + cityname + '/'
 	if keyword:
-		file_name = "placeid_" + keyword + "_" + cityname + ".txt"
+		file_name = "placeid_" + keyword + "_" + cityname + "_coordinate_search.txt"
 	else:
-		file_name = "placeid_" + cityname + ".txt"
+		file_name = "placeid_" + cityname + "_coordinate_search.txt"
 	output = open(out_file_path + file_name, 'w')
 
 	for place_name in coodinate_dict.keys():
@@ -88,8 +88,9 @@ def main():
 		latitude = float(coordinate[0])
 		longtitude = float(coordinate[1])
 		if count_invoke == 13:
-			print 'Retrying in 15 minutes...zz....' 
+			print 'Sleep for 15 minutes...zz....' 
 			time.sleep(60*15 + 5)
+			print '..zz...Awake !! Restart'
 			count_invoke = 0
 		places_info = geo_search(twitter_api, place_name, latitude, longtitude)
 		count_invoke += 1
