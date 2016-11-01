@@ -11,5 +11,6 @@ venv/
 .ipynb_checkpoints/
 *.ipynb
 
-# Settings
+# Settings and credentials
 settings.py
+py_scripts/credentials.py
