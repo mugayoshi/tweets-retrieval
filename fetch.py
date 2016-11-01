@@ -1,6 +1,4 @@
 import sys
-import io
-from datetime import datetime
 
 from tweepy import API
 from tweepy import OAuthHandler
@@ -8,15 +6,21 @@ from tweepy import Stream
 from tweepy import Cursor
 
 from tweet import Tweet
-from credentials import ACCESS_TOKEN, ACCESS_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_SECRET
+from settings import ACCESS_TOKEN, ACCESS_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_SECRET
 
-def search(query,output_file,
+def fetch(query, output_file=sys.stdout, debug_file=None,
            lang="en",
            geocode="",
-           max_count=100000):
+           max_count=500000):
+    '''
+    Fetches query results into output_files, and prints raw json results into debug_file
+    '''
     auth = OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     api = API(auth,
+              retry_count=10,
+              retry_delay=15,
+              timeout=60,
               wait_on_rate_limit=True,
               wait_on_rate_limit_notify=True)
 
@@ -26,6 +30,7 @@ def search(query,output_file,
     for result in Cursor(api.search,
                          q=query,
                          lang=lang).items(max_count):
+        if debug_file: print(result.text+"\n", file=debug_file)
         tweet = Tweet(result.text)
         t = tweet.preprocess()
         if t and tweet.isTagged():
@@ -36,30 +41,15 @@ def search(query,output_file,
     print("Loop end:", ok_count, "/", count, "tweets saved")
 
 def get_query(keywords,
-           retweets=False,
-           since="",
-           until="",
-           geocode="",):
+          retweets=False,
+          since="",
+          until="",
+          geocode="",):
+    '''
+    Returns query from list of keywords
+    '''
     q = " OR ".join(keywords)
     q += ("" if retweets else " -filter:retweets")
     q += (" since:" + since if since else "")
     q += (" until:" + until if until else "")
     return q
-
-if __name__ == '__main__':
-    # keywords = sys.argv[1:]
-    # output_path = "data/" + "_".join(keywords) + ".txt"
-    # with io.open(output_path, 'w') as output_file:
-    #    streaming.stream(keywords,language='en',output_file=output_file,max_count=10000)
-    
-    # q = input("Search for:")
-    keywords = []
-    q = get_query(keywords)
-    output_path = "/home/local/data/stream_output.txt"
-    start_time = datetime.now()
-    with io.open(output_path, 'w') as f:
-        search(q,f)
-    end_time = datetime.now()
-    print("Execution time:", end_time - start_time)
-
-
