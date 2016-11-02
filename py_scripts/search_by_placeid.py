@@ -77,7 +77,7 @@ def main():
 	auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET)
 	twitter_api = twitter.Twitter(auth=auth)
 
-	num_results = 1000#!!! this number is variable. !!!
+	num_results = 100#!!! this number is variable. !!!
 
 	date = time.strftime("%d%b%Y%H%M")
 	argvs = sys.argv
@@ -125,6 +125,7 @@ def main():
 				output.write(s)
 				retrieved_tweets += 1
 		#the end of the for loop for each place
+		print str(retrieved_tweets) + ' have been retrieved until now.'
 		print 'sleeps for half hour to wait for the next loop'
 		time.sleep(60 * 30 + 5)
 	#the end of the while loop

@@ -9,7 +9,7 @@ def getCoordinates(city_name, keyword):
 	file_name = ''
 	#print 'city name: ' + city_name
 	for f in os.listdir(data_path):
-		if city_name in f and f.endswith('txt') and 'coordinate' in f and keyword in f:
+		if city_name in f and f.endswith('txt') and f.startswith('coordinate') and keyword in f:
 			file_name = data_path + f
 			break
 	if len(file_name) == 0:

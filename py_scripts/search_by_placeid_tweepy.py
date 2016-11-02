@@ -11,6 +11,8 @@ from tweepy import Cursor
 from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
 import time
 import os
+import common_functions as cf
+
 def search(query, lang, output, max_count=10000):#mac count is set to 10000 in Adam's version
 	auth = OAuthHandler(CONSUMER_KEY, CONSUMER_KEY_SECRET)
 	auth.set_access_token(OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
@@ -97,7 +99,9 @@ def main():
 		quit()
 		#file_name = "tweets-" + date + "-" + city_name + ".txt"
 	file_name = file_name.replace(' ', '')
-	out_file_path = '/home/muga/twitter/tweets_from_searchAPI/tweepy/'
+	out_file_path = '/home/muga/twitter/tweets_from_searchAPI/tweepy/' + city_name + '/'
+	cf.validate_directory(out_file_path)
+
 	output = open(out_file_path + file_name, 'w')
 
 	start_time = datetime.now()

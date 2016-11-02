@@ -61,6 +61,7 @@ def main():
 		area_range = accuracy / 1000 #km
 		file_name = "placeid_" + latitude + "_" + longtitude + "_" + str(area_range) + "km_"+ ".txt"
 	else:
+		cityname = cityname.replace(' ','')
 		out_file_path = "/home/muga/twitter/place_id_data/" + cityname + "/"
 		if granularity:
 			file_name = "placeid_" + cityname + "_" + granularity + ".txt"
