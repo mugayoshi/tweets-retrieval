@@ -19,7 +19,7 @@ def classification(filename_train, filename_test):
 	out_file_name = filename_test.split('/')[-1] + '.txt'
 	city_name = sys.argv[1]
 	out_file_path = "/home/muga/twitter/classification_result/random_forest/" + city_name + '/'
-	cf.validateDirectory(out_file_path)
+	cf.validate_directory(out_file_path)
 
 	out = open(out_file_path + out_file_name, 'a')
 
@@ -161,7 +161,7 @@ def main():
 	lang = sys.argv[2]
 	target_date = sys.argv[3]
 	test_data_path = '/home/muga/twitter/test_data/retrieved_data/' + city_name + '/'
-	cf.validateDirectory(test_data_path)
+	cf.validate_directory(test_data_path)
 	training_data_path = '/home/muga/twitter/original_trainingdata/'
 	train_data = ''
 	test_data = ''#tweet data obtained from search API
