@@ -62,27 +62,6 @@ def showResult(score, y_pred, out):
 
 	return
 
-def extractTweetAndLabelForTestData(filename):#from spanish data version
-	input_file = open(filename, 'rb')
-	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
-	data = []
-	header = next(csv_reader)
-	for row in csv_reader:
-		try:
-			row[0].decode('utf-8', 'strict') #depends on file
-		except:
-			continue
-		data.append(row[0]) #depends on file
-
-	if len(data) == 0:
-		print 'no data'
-		quit()
-	else:
-		print len(data)
-			
-	return data
-
-
 def extractTweetAndLabelForTrainData(filename):
 	input_file = open(filename, 'rb')
 	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
@@ -142,7 +121,7 @@ def getFeatureVecsAndLabel(file_train_data, file_test_data):#for both training a
 		labels_train, tweets_train = extractSpanishData(file_train_data)
 	else:
 		labels_train, tweets_train = extractTweetAndLabelForTrainData(file_train_data)
-	tweets_test = extractTweetAndLabelForTestData(file_test_data)
+	tweets_test = cf.extract_tweet_from_test_data(file_test_data)
 
 	count_vectorizer_train = CountVectorizer()
 	feat_vec_train = count_vectorizer_train.fit_transform(tweets_train)

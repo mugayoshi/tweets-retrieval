@@ -1,4 +1,5 @@
 import os
+import csv
 def validate_directory(path):
 	if os.path.isdir(path) == False:
 		print path + ' is not found or wrong. abort.'
@@ -12,3 +13,24 @@ def validate_language(lang):
 		quit()
 
 	return True
+
+def extract_tweet_from_test_data(filename):
+	input_file = open(filename, 'rb')
+	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
+	data = []
+	header = next(csv_reader)
+	for row in csv_reader:
+		try:
+			row[0].decode('utf-8', 'strict') #depends on file
+		except:
+			continue
+		data.append(row[0]) #depends on file
+
+	if len(data) == 0:
+		print 'no data'
+		quit()
+	else:
+		print len(data)
+			
+	return data
+
