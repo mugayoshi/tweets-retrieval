@@ -13,6 +13,7 @@ import common_functions as cf
 
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC, LinearSVC
+from datetime import datetime
 
 def classification(filename_train, filename_test, strategy):
 	label_train, feat_vec_train, feat_vec_test = getFeatureVecsAndLabel(filename_train, filename_test)
@@ -25,17 +26,25 @@ def classification(filename_train, filename_test, strategy):
 	cf.validate_directory(out_file_path)
 
 	out = open(out_file_path + out_file_name, 'a')
+	start_time = datetime.now()
 
 	for score in scores:
 		out.write('\n' + '-'*50)
 		out.write(score)
 		out.write('-'*50)
 
-		tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4], 'C': [1, 10, 100, 1000]}, {'kernel':['linear'], 'C': [1, 10, 100, 1000] }]
-		if strategy == 'one_against_rest':
+		if strategy == 'one_against_the_rest':
+			tuned_parameters = {'C': [1, 10, 100, 1000], 'tol':[1e-3, 1e-4], 'multi_class': ['ovr', 'crammer_singer'] }
 			clf = GridSearchCV(LinearSVC(C=1), param_grid=tuned_parameters, cv=5, scoring=score, n_jobs=-1)
 		elif strategy == 'one_against_one':
+			tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4], 'C': [1, 10, 100, 1000]}, {'kernel':['linear'], 'C': [1, 10, 100, 1000] }]
 			clf = GridSearchCV(SVC(C=1), param_grid=tuned_parameters, cv=5, scoring=score, n_jobs=-1)
+		elif strategy = 'random_forest':
+			tuned_parameters = [{'n_estimators': [10, 30, 50, 70, 90, 110, 130, 150], 'max_features':['auto', 'sqrt', 'log2', None]}]
+			clf = GridSearchCV(RandomForestClassifier(), param_grid=tuned_parameters, cv=3, scoring=score, n_jobs=-1)
+		else:
+			print strategy + ' is wrong'
+			quit()
 		clf.fit(feat_vec_train, label_train)
 		print clf.best_estimator_
 
@@ -44,6 +53,7 @@ def classification(filename_train, filename_test, strategy):
 		showResult(score, y_pred, out)
 		print 'loop for ' + score + ' has done\n' 
 	
+	cf.write_exec_time(start_time, out)
 	out.close()
 	print "classification of " + filename_train + " has done" 
 	return
@@ -103,9 +113,10 @@ def extractTweetAndLabelForTrainData(filename):
 			continue
 		data.append(row[4]) 
 	#end of the for loop
+	print 'training data positive: ' + str(pos) + ' negative: ' + str(neg) + ' neutral: ' + str(neu) + ' n/a: ' + str(n_a)
 	return (labels, data)
 
-def extractSpanishData(filename):
+def extractSpanishData(filename):#for training data
 	input_file = open(filename, 'rb')
 	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
 	labels = []
@@ -165,11 +176,13 @@ def main():
 		print 'please input city name,  language and target date to specify the training data file'
 		quit()
 
-	clf_strategy  = raw_input('One against One (0) or One against The Rest (1)=' )
+	clf_strategy  = raw_input('One against One (0), One against The Rest (1) or Random Forest (2)  ----> ' )
 	if clf_strategy == str(0):
 		strategy = 'one_against_one'
 	elif clf_strategy == str(1):
 		strategy = 'one_against_the_rest'
+	elif clf_strategy == str(2):
+		strategy = 'random_forest'
 	else:
 		print 'wrong input ' + clf_strategy
 		quit()
