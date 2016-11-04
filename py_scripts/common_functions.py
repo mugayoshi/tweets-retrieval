@@ -1,5 +1,6 @@
 import os
 import csv
+from datetime import datetime
 def validate_directory(path):
 	if os.path.isdir(path) == False:
 		print path + ' is not found or wrong. abort.'
@@ -34,3 +35,9 @@ def extract_tweet_from_test_data(filename):
 			
 	return data
 
+def write_exec_time(start_time, output):
+	end_time = datetime.now()
+	exec_time = 'Execution time:%s' % (end_time - start_time)
+	print exec_time
+	output.write('\n\n\n' + exec_time + '\n')
+	return
