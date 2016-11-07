@@ -135,7 +135,7 @@ def extractSpanishData(filename):#for training data
 			non_utf_8 = non_utf_8 + 1
 			continue
 		if row[0] == "2": #neutral
-			labels.append(1)
+			labels.append(2)
 			neu += 1
 		elif row[0] == "1": #negative
 			labels.append(1)
