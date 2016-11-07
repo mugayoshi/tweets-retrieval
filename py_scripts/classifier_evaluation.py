@@ -18,7 +18,7 @@ def classification(filename, strategy):
 	data_train, data_test, label_train, label_test = train_test_split(feature_vec, labels, test_size=0.2)
 	
 	print 'data extraction has done'
-	scores = ['accuracy', 'precision', 'recall']
+	scores = ['accuracy', 'precision_micro', 'recall_weighted', 'f1_micro']
 
 	date = time.strftime('%d%b%Y%H%M')
 	out_file_name = filename.split('/')[-1].split('.')[0] + '_' + date+ '.txt'
@@ -26,6 +26,7 @@ def classification(filename, strategy):
 	cf.validate_directory(out_file_path)
 
 	out = open(out_file_path + out_file_name, 'a')
+	start_time = datetime.now()
 	for score in scores:
 		out.write('\n' + '-'*50)
 		out.write(score)
@@ -47,8 +48,9 @@ def classification(filename, strategy):
 
 		print 'loop for ' + score + ' has done\n' 
 	
+	cf.write_exec_time(start_time, out)
 	out.close()
-	print "classification of " + filename + " has done" 
+	print "classification of " + filename + " with " + strategy + " has done" 
 	return
 
 def extractTweetAndLabel(filename):#from spanish data version
@@ -147,7 +149,7 @@ def extractSpanishData(filename):#for training data
 			non_utf_8 = non_utf_8 + 1
 			continue
 		if row[0] == "2": #neutral
-			labels.append(1)
+			labels.append(2)
 			neu += 1
 		elif row[0] == "1": #negative
 			labels.append(1)
