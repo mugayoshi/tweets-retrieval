@@ -95,7 +95,7 @@ def main():
 	lang = sys.argv[2]
 	target_date = sys.argv[3]
 	test_datas_path = '/home/muga/twitter/tweets_from_searchAPI/tweepy/' + city_name + '/'
-	cf.validateDirectory(test_datas_path)
+	cf.validate_directory(test_datas_path)
 	test_data_files = []
 	for f in os.listdir(test_datas_path):
 		if lang in f and target_date in f:
@@ -112,8 +112,7 @@ def main():
 		quit()
 
 	out_path = '/home/muga/twitter/test_data/retrieved_data/' + city_name + '/'
-	cf.validateDirectory(out_path)
-	date = time.strftime("%d%b%Y%H%M")
+	cf.validate_directory(out_path)
 	output_file = open(out_path + city_name + '_' + lang + '_' + target_date + '.csv', 'wb')
 	
 	for f in test_data_files:
