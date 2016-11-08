@@ -18,7 +18,7 @@ from datetime import datetime
 def classification(filename_train, filename_test, strategy):
 	label_train, feat_vec_train, feat_vec_test = getFeatureVecsAndLabel(filename_train, filename_test)
 	print 'data extraction has done'
-	scores = ['accuracy', 'precision', 'recall']
+	scores = ['accuracy', 'precision_micro', 'recall_weighted', 'f1_micro']
 
 	out_file_name = filename_test.split('/')[-1] + '.txt'
 	city_name = sys.argv[1]
@@ -39,7 +39,7 @@ def classification(filename_train, filename_test, strategy):
 		elif strategy == 'one_against_one':
 			tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4], 'C': [1, 10, 100, 1000]}, {'kernel':['linear'], 'C': [1, 10, 100, 1000] }]
 			clf = GridSearchCV(SVC(C=1), param_grid=tuned_parameters, cv=5, scoring=score, n_jobs=-1)
-		elif strategy = 'random_forest':
+		elif strategy == 'random_forest':
 			tuned_parameters = [{'n_estimators': [10, 30, 50, 70, 90, 110, 130, 150], 'max_features':['auto', 'sqrt', 'log2', None]}]
 			clf = GridSearchCV(RandomForestClassifier(), param_grid=tuned_parameters, cv=3, scoring=score, n_jobs=-1)
 		else:
