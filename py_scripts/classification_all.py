@@ -14,16 +14,22 @@ import common_functions as cf
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC, LinearSVC
 from datetime import datetime
+import itertools
 
 def classification(filename_train, filename_test, strategy):
-	label_train, feat_vec_train, feat_vec_test = getFeatureVecsAndLabel(filename_train, filename_test)
+	label_train, feat_vec_train, feat_vec_test, tweets = getFeatureVecsAndLabel(filename_train, filename_test)
 	print 'data extraction has done'
 	scores = ['accuracy', 'precision_micro', 'recall_weighted', 'f1_micro']
 
-	out_file_name = filename_test.split('/')[-1] + '.txt'
+	date = time.strftime("%d%b%Y%H%M")
+	out_file_name = filename_test.split('/')[-1] + '_' + date + '.txt'
+	out_file_name = out_file_name.replace('.csv', '')
 	city_name = sys.argv[1]
 	out_file_path = "/home/muga/twitter/classification_result/" + strategy + "/" + city_name + '/'
-	cf.validate_directory(out_file_path)
+	cf.validate_directory(out_file_path, True)
+	lang = sys.argv[2]
+	another_out_file_path = out_file_path + lang + '/'
+	cf.validate_directory(another_out_file_path, True)
 
 	out = open(out_file_path + out_file_name, 'a')
 	start_time = datetime.now()
@@ -51,6 +57,7 @@ def classification(filename_train, filename_test, strategy):
 		y_pred = clf.predict(feat_vec_test)
 
 		showResult(score, y_pred, out)
+		writeResult(score, y_pred, tweets, out_file_name, another_out_file_path)
 		print 'loop for ' + score + ' has done\n' 
 	
 	cf.write_exec_time(start_time, out)
@@ -79,6 +86,18 @@ def showResult(score, y_pred, out):
 	print result
 
 	return
+
+def writeResult(score, y_pred, tweets, filename_test, output_path):
+	if not len(y_pred) == len(tweets):
+		print 'the length of y_pred and tweets does not match'
+		quit()
+	out_file_name = 'result_' + score + '_' + filename_test
+	out = open(output_path + out_file_name, 'a')
+
+	for label, tweet in itertools.izip(y_pred, tweets):
+		l = cf.get_emotion_label(label)
+		out.write(l + ', ' + tweet + '\n')
+	out.close()
 
 
 def extractTweetAndLabelForTrainData(filename):
@@ -169,7 +188,7 @@ def getFeatureVecsAndLabel(file_train_data, file_test_data):#for both training a
 	count_vectorizer_test = CountVectorizer(vocabulary=voc)
 	feat_vec_test = count_vectorizer_test.fit_transform(tweets_test)
 
-	return (labels_train, feat_vec_train, feat_vec_test)
+	return (labels_train, feat_vec_train, feat_vec_test, tweets_test)
 
 def main():
 	if len(sys.argv) < 3:
