@@ -1,10 +1,17 @@
 import os
 import csv
 from datetime import datetime
-def validate_directory(path):
-	if os.path.isdir(path) == False:
-		print path + ' is not found or wrong. abort.'
-		quit()
+import time
+def validate_directory(path, create_dir=False):
+	if not os.path.exists(path):
+		print path + ' is not found.'
+		if create_dir:
+			os.makedirs(path)
+			print 'directory ' + path + ' is created'
+			time.sleep(5)#sleeps for 5 secs
+		else:
+			print 'abort'
+			quit()
 	return
 
 def validate_language(lang):
@@ -31,7 +38,7 @@ def extract_tweet_from_test_data(filename):
 		print 'no data'
 		quit()
 	else:
-		print len(data)
+		print 'this file contains ' + str(len(data)) + ' tweets'
 			
 	return data
 
@@ -41,3 +48,14 @@ def write_exec_time(start_time, output):
 	print exec_time
 	output.write('\n\n\n' + exec_time + '\n')
 	return
+
+def get_emotion_label(label):
+	if label == 0:
+		return 'pos'
+	elif label == 1:
+		return 'neg'
+	elif label == 2:
+		return 'neu'
+	else:
+		print 'something is wrong with this ' + str(label)
+		quit()
