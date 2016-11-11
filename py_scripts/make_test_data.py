@@ -112,7 +112,7 @@ def main():
 		quit()
 
 	out_path = '/home/muga/twitter/test_data/retrieved_data/' + city_name + '/'
-	cf.validate_directory(out_path)
+	cf.validate_directory(out_path, True)
 	output_file = open(out_path + city_name + '_' + lang + '_' + target_date + '.csv', 'wb')
 	
 	for f in test_data_files:
