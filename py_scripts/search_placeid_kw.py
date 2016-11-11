@@ -1,8 +1,9 @@
 import twitter
 import json
 import sys
-from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
 import os
+import common_functions as cf
+import time
 def validate_area(country, searched):
 	if searched == 'US':
 		searched = 'United States'
@@ -13,14 +14,17 @@ def validate_area(country, searched):
 	else:
 		return False
 def main():
-	auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET)
-
-	twitter_api = twitter.Twitter(auth=auth)
+	twitter_api = cf.authentication_twitter(sys.argv[-1])
 	argvs = sys.argv
 	searched_country = ''
 	if len(argvs) > 1:
 		cityname = argvs[1]
-		if argvs[2]:
+		if len(sys.argv) > 2 and sys.argv[2].isalpha() == False:
+			wait_time = int(sys.argv[2])
+			print 'Please wait for ' + sys.argv[2] + ' minutes'
+			time.sleep(60*wait_time + 5)
+
+		if 't' in argvs[2]:#argvs[2] has to contain 't' to make 'non_city_name' true.
 			non_city_name = True
 			print 'non_city_nam is True'
 		else:

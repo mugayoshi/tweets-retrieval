@@ -2,6 +2,11 @@ import os
 import csv
 from datetime import datetime
 import time
+from tweepy import API
+from tweepy import OAuthHandler
+from settings_adam import OAUTH_TOKEN_adam, OAUTH_TOKEN_SECRET_adam, CONSUMER_KEY_adam, CONSUMER_KEY_SECRET_adam
+import twitter
+from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
 def validate_directory(path, create_dir=False):
 	if not os.path.exists(path):
 		print path + ' is not found.'
@@ -59,3 +64,32 @@ def get_emotion_label(label):
 	else:
 		print 'something is wrong with this ' + str(label)
 		quit()
+
+def authentication_tweepy(user='muga'):
+	if user == 'muga':
+		auth = OAuthHandler(CONSUMER_KEY, CONSUMER_KEY_SECRET)
+		auth.set_access_token(OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+	elif user == 'adam':
+		auth = OAuthHandler(CONSUMER_KEY_adam, CONSUMER_KEY_SECRET_adam)
+		auth.set_access_token(OAUTH_TOKEN_adam, OAUTH_TOKEN_SECRET_adam)
+	else:
+		print 'user ' + user + ' is wrong'
+		quit()
+
+	api = API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+	return api
+
+def authentication_twitter(user='muga'):
+	if user == 'muga':
+		auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET)
+		twitter_api = twitter.Twitter(auth=auth)
+
+	elif user == 'adam':
+		auth = twitter.oauth.OAuth(OAUTH_TOKEN_adam, OAUTH_TOKEN_SECRET_adam, CONSUMER_KEY_adam, CONSUMER_KEY_SECRET_adam)
+	else:
+		print 'user ' + user + ' is wrong'
+		quit()
+	
+	twitter_api = twitter.Twitter(auth=auth)
+	return twitter_api
+

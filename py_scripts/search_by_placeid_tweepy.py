@@ -8,15 +8,12 @@ from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy import Cursor
 
-from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
 import time
 import os
 import common_functions as cf
 
-def search(query, lang, output, max_count=10000):#mac count is set to 10000 in Adam's version
-	auth = OAuthHandler(CONSUMER_KEY, CONSUMER_KEY_SECRET)
-	auth.set_access_token(OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-	api = API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+def search(query, lang, output, max_count=10000):#max count is set to 10000 in version of Adam
+	api = cf.authentication_tweepy(sys.argv[-1])
 
 	retrieved_tweets = 0
 	six_days_ago = (datetime.now() - timedelta(days=6)).date()#due to the time difference, it is set to be 6 days ago.
@@ -54,18 +51,19 @@ def getPlaceID(city_name):
 
 	place_id_dict = {}
 	while s: #until the end of the file
-		if s.startswith('city name') or s.startswith('place name'):
+		if s.startswith('city name') or s.startswith('place name') or s.startswith('keyword'):
 			s = input.readline()
 			continue
 		splitted_line =  s.split(':')
+		#print splitted_line #for debug
 		place_id = splitted_line[0]
 		place_fullname = splitted_line[1]
 		place_name = splitted_line[2]
 		place_list = [place_fullname, place_name]
 		place_id_dict[place_id] = place_list
 		s = input.readline()
-		
-	
+
+
 	return place_id_dict
 
 
@@ -90,12 +88,12 @@ def get_query(q, retweets=False, since="", until="", geocode="",):
 def main():
 	date = time.strftime("%d%b%Y%H%M")
 	argvs = sys.argv
-	if len(argvs) == 3:
+	if len(argvs) > 3:
 		city_name = argvs[1]
 		lang = argvs[2]
-		file_name = "tweets_" + date + "_" + lang + "_"+ city_name + ".txt"
+		file_name = city_name + "_" + lang + "_" + date + ".txt"
 	else:
-		print 'please input city name and languange'
+		print 'please input city name and languange and user name'
 		quit()
 		#file_name = "tweets-" + date + "-" + city_name + ".txt"
 	file_name = file_name.replace(' ', '')
@@ -109,6 +107,7 @@ def main():
 	place_id_dict = getPlaceID(city_name)
 	retrieved_tweets = 0
 	query = ''
+	count_loop = 1
 	for place in place_id_dict.keys():
 		place_name = place_id_dict[place]
 		q = "place:%s" % place 
@@ -119,14 +118,13 @@ def main():
 
 		obtained_tweets = search(query, lang, output)#!!!! search function returns the number of the retrieved tweets
 		print str(obtained_tweets) + ' are retrieved in this loop from ' + place_name[0]
+		print '-------' + str(count_loop) + '/' +  str(len(place_id_dict)) + '-------'
 		retrieved_tweets += obtained_tweets
+		count_loop += 1
 #the end of the for loop for each place
 
-	print str(retrieved_tweets) + ' are retrieved'
-	end_time = datetime.now()
-	exec_time = 'Execution time:%s' % (end_time - start_time)
-	print exec_time
-	output.write('\n\n\n' + exec_time + '\n')
+	print str(retrieved_tweets) + ' are retrieved ' + argvs[0] + ' is done'
+	cf.write_exec_time(start_time, output)
 	output.close()
 if __name__ == '__main__':
 	main()

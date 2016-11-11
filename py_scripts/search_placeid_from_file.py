@@ -2,7 +2,6 @@ import twitter
 import json
 import sys
 import os
-from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
 import time
 import common_functions as cf
 def getCoordinates(city_name, keyword):
@@ -22,6 +21,7 @@ def getCoordinates(city_name, keyword):
 
 	coodinate_dict = {}
 	while s: #until the end of the file
+		#print s#for debug
 		splitted_line =  s.split(',')
 		if not len(splitted_line) == 3:
 			s = input.readline()
@@ -64,12 +64,10 @@ def write_place_info(places_info, place_name, output):
 
 
 def main():
-	auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET)
-
-	twitter_api = twitter.Twitter(auth=auth)
+	twitter_api = cf.authentication_twitter(sys.argv[-1])
 	if len(sys.argv) > 1:
 		cityname = sys.argv[1]
-		if len(sys.argv) == 3:
+		if len(sys.argv) > 2 and sys.argv[2].isalpha() == False:
 			wait_time = int(sys.argv[2])
 			print 'Please wait for ' + sys.argv[2] + ' minutes'
 			time.sleep(60*wait_time + 5)
