@@ -4,6 +4,7 @@ import sys
 import os
 from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
 import time
+import common_functions as cf
 def getCoordinates(city_name, keyword):
 	data_path = '/home/muga/twitter/place_id_data/' + city_name + '/'
 	file_name = ''
@@ -22,6 +23,8 @@ def getCoordinates(city_name, keyword):
 	coodinate_dict = {}
 	while s: #until the end of the file
 		splitted_line =  s.split(',')
+		if not len(splitted_line) == 3:
+			s = input.readline()
 		place_name = splitted_line[0]
 		latitude = splitted_line[1]
 		longtitude = splitted_line[2]
@@ -64,7 +67,15 @@ def main():
 	auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET)
 
 	twitter_api = twitter.Twitter(auth=auth)
-	cityname = raw_input('query (London, NewYork etc)=' )
+	if len(sys.argv) > 1:
+		cityname = sys.argv[1]
+		if len(sys.argv) == 3:
+			wait_time = int(sys.argv[2])
+			print 'Please wait for ' + sys.argv[2] + ' minutes'
+			time.sleep(60*wait_time + 5)
+
+	else:
+		cityname = raw_input('query (London, NewYork etc)=' )
 	#print "granularity (poi, neighborhood, city, admin, country) = ",
 	if len(sys.argv) < 2 and cityname == 'London':
 		print 'Please Input Keyword. e.g. centre, outer'
@@ -77,6 +88,7 @@ def main():
 	coodinate_dict = getCoordinates(cityname, keyword)
 	count_invoke = 0
 	out_file_path = "/home/muga/twitter/place_id_data/" + cityname + '/'
+	cf.validate_directory(out_file_path)
 	if keyword:
 		file_name = "placeid_" + keyword + "_" + cityname + "_coordinate_search.txt"
 	else:
