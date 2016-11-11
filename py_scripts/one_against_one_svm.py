@@ -1,11 +1,11 @@
 import sys
 import os
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn import svm
 from sklearn.grid_search import GridSearchCV
 import csv
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
+from sklearn.multiclass import OneVsRestClassifier
+
 
 
 def extractLabelAndData(input_file):
