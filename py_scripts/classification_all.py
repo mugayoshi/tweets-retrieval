@@ -27,7 +27,7 @@ def classification(filename_train, filename_test, strategy):
 	city_name = sys.argv[1]
 	out_file_path = "/home/muga/twitter/classification_result/" + strategy + "/" + city_name + '/'
 	cf.validate_directory(out_file_path, True)
-	lang = sys.argv[2]
+	lang = cf.find_lang(filename_test.split('/')[-1])
 	another_out_file_path = out_file_path + lang + '/'
 	cf.validate_directory(another_out_file_path, True)
 
@@ -174,7 +174,7 @@ def extractSpanishData(filename):#for training data
 
 def getFeatureVecsAndLabel(file_train_data, file_test_data):#for both training and test data
 	#generate a matrix of token counts
-	lang = sys.argv[2]
+	lang = cf.find_lang(file_test_data.split('/')[-1])
 	if lang == 'es':
 		labels_train, tweets_train = extractSpanishData(file_train_data)
 	else:
@@ -190,9 +190,20 @@ def getFeatureVecsAndLabel(file_train_data, file_test_data):#for both training a
 
 	return (labels_train, feat_vec_train, feat_vec_test, tweets_test)
 
+def check_lang_file(filename, input_lang):
+	languages = ['de', 'en', 'es', 'fr', 'pt']
+	if not input_lang in languages:
+		print 'wront input ' + input_lang
+		quit()
+	for w in filename.split('_'):
+		if input_lang == w:
+			print 'check_lang_file ' + input_lang + ' ' + w
+			return True
+	return False
+
 def main():
-	if len(sys.argv) < 3:
-		print 'please input city name,  language and target date to specify the training data file'
+	if len(sys.argv) < 2:
+		print 'please input city. And if neccesary enter languageand  target date to specify the training data file'
 		quit()
 
 	clf_strategy  = raw_input('One against One (0), One against The Rest (1) or Random Forest (2)  ----> ' )
@@ -206,34 +217,63 @@ def main():
 		print 'wrong input ' + clf_strategy
 		quit()
 	city_name = sys.argv[1]
-	lang = sys.argv[2]
-	target_date = sys.argv[3]
+	if len(sys.argv) == 3:
+		if sys.argv[2] in ['de', 'en', 'es', 'fr', 'pr']:
+			lang = sys.argv[2]
+			target_date = ''
+		elif len(sys.argv) == 3:
+			target_date = sys.argv[2]
+			lang = ''
+		else:
+			print 'wrong input'
+			quit()
+	elif len(sys.argv) == 4:
+		lang = sys.argv[2]
+		target_date = sys.argv[3]
+	else:
+		lang = ''
+		target_date = ''
 	test_data_path = '/home/muga/twitter/test_data/retrieved_data/' + city_name + '/'
 	cf.validate_directory(test_data_path)
 	training_data_path = '/home/muga/twitter/original_trainingdata/'
-	train_data = ''
-	test_data = ''#tweet data obtained from search API
+	train_data_dict = {}
+	test_data_list = []#tweet data obtained from search API
 	for f in os.listdir(test_data_path):
 		if f.endswith('.csv') and f.startswith('') and target_date in f and lang in f:
-			test_data = test_data_path + f
-			break
-	for f in os.listdir(training_data_path):
-		if f.endswith('.csv') and 'merge' in f and lang in f:
-			train_data = training_data_path + f
-			break
-		if lang == 'es' and 'training_data' in f and lang in f:
-			train_data = training_data_path + f
-			break
+			if lang and check_lang_file(f, lang):
+					test_data_list.append(test_data_path + f)
+			elif not lang:
+				test_data_list.append(test_data_path + f)
 
-	print 'train data: ' + train_data
-	print 'test data: ' + test_data
+	for f in os.listdir(training_data_path):
+		if f.endswith('.csv') and 'merge' in f:
+			language = cf.find_lang(f)
+			train_data_dict[language] = training_data_path + f
+			
+		elif 'es' in f and 'training_data' in f and f.endswith('.csv'):
+			language = cf.find_lang(f)
+			train_data_dict[language] = training_data_path + f
+
+	print 'list of test data: '
+	print '\n'.join(test_data_list)
 	
+	print 'list of training data: '
+	for k in train_data_dict:
+		print k, train_data_dict[k]
+
 	confirm = raw_input('It is going to process these files with %s. Is it okay ? (yes/no)' % strategy)
 	if not confirm.lower() in 'yes':
 		print 'cancel'
 		quit()
-	
-	classification(train_data, test_data, strategy) 
+	for test_data in test_data_list:
+		if lang:
+			language = lang
+		else:
+			language = cf.find_lang(test_data.split('/')[-1])
+		train_data = train_data_dict[language]
+		print 'train data: ' + train_data
+		print 'test on ' + test_data
+		classification(train_data, test_data, strategy) 
 
 if __name__ == "__main__":
 	main()
