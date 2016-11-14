@@ -5,6 +5,7 @@ import time
 from tweepy import API
 from tweepy import OAuthHandler
 from settings_adam import OAUTH_TOKEN_adam, OAUTH_TOKEN_SECRET_adam, CONSUMER_KEY_adam, CONSUMER_KEY_SECRET_adam
+from settings_adam import OAUTH_TOKEN_berta, OAUTH_TOKEN_SECRET_berta, CONSUMER_KEY_berta, CONSUMER_KEY_SECRET_berta
 import twitter
 from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
 def validate_directory(path, create_dir=False):
@@ -72,6 +73,9 @@ def authentication_tweepy(user='muga'):
 	elif user == 'adam':
 		auth = OAuthHandler(CONSUMER_KEY_adam, CONSUMER_KEY_SECRET_adam)
 		auth.set_access_token(OAUTH_TOKEN_adam, OAUTH_TOKEN_SECRET_adam)
+	elif user == 'berta':
+		auth = OAuthHandler(CONSUMER_KEY_berta, CONSUMER_KEY_SECRET_berta)
+		auth.set_access_token(OAUTH_TOKEN_berta, OAUTH_TOKEN_SECRET_berta)
 	else:
 		print 'user ' + user + ' is wrong'
 		quit()
@@ -82,10 +86,10 @@ def authentication_tweepy(user='muga'):
 def authentication_twitter(user='muga'):
 	if user == 'muga':
 		auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET)
-		twitter_api = twitter.Twitter(auth=auth)
-
 	elif user == 'adam':
 		auth = twitter.oauth.OAuth(OAUTH_TOKEN_adam, OAUTH_TOKEN_SECRET_adam, CONSUMER_KEY_adam, CONSUMER_KEY_SECRET_adam)
+	elif user == 'berta':
+		auth = twitter.oauth.OAuth(OAUTH_TOKEN_berta, OAUTH_TOKEN_SECRET_berta, CONSUMER_KEY_berta, CONSUMER_KEY_SECRET_berta)
 	else:
 		print 'user ' + user + ' is wrong'
 		quit()
@@ -93,3 +97,9 @@ def authentication_twitter(user='muga'):
 	twitter_api = twitter.Twitter(auth=auth)
 	return twitter_api
 
+def find_lang(filename):
+	languages = ['de', 'en', 'es', 'fr', 'pt']
+	for lang in languages:
+		if lang in filename:
+			return lang
+	return ''
