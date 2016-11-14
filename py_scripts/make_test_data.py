@@ -87,17 +87,20 @@ def getEmoticonList(emotion):
 
 
 def main():
-	if len(sys.argv) < 4:
-		print 'the input must have city name, language and target date of the text file'
+	if len(sys.argv) < 3:
+		print 'the input must have city name and target date of the text file. If necessary, also language'
 		quit()
 	
 	city_name = sys.argv[1]
-	lang = sys.argv[2]
-	target_date = sys.argv[3]
-	test_datas_path = '/home/muga/twitter/tweets_from_searchAPI/tweepy/' + city_name + '/'
-	cf.validate_directory(test_datas_path)
+	target_date = sys.argv[2]
+	if len(sys.argv) == 4:
+		lang = sys.argv[3]
+	else:
+		lang = ''
+	test_data_path = '/home/muga/twitter/tweets_from_searchAPI/tweepy/' + city_name + '/'
+	cf.validate_directory(test_data_path)
 	test_data_files = []
-	for f in os.listdir(test_datas_path):
+	for f in os.listdir(test_data_path):
 		if lang in f and target_date in f:
 			test_data_files.append(f)
 			print f + ' is appended' 
@@ -113,15 +116,26 @@ def main():
 
 	out_path = '/home/muga/twitter/test_data/retrieved_data/' + city_name + '/'
 	cf.validate_directory(out_path, True)
-	output_file = open(out_path + city_name + '_' + lang + '_' + target_date + '.csv', 'wb')
-	
-	for f in test_data_files:
-		input_file = open(test_datas_path + f)
-		lines = input_file.readlines()
-		#validate each sentence again.
-		#write
-		writeToFile(lines, output_file)
-	output_file.close()
+	if lang:
+		output_file = open(out_path + city_name + '_' + lang + '_' + target_date + '.csv', 'wb')
+		for f in test_data_files:
+			input_file = open(test_data_path + f)
+			lines = input_file.readlines()
+			#validate each sentence again.
+			#write
+			writeToFile(lines, output_file)
+		output_file.close()
+	else:
+		for f in test_data_files:
+			language = cf.find_lang(f)
+			input_file = open(test_data_path + f)
+			lines = input_file.readlines()
+			#validate each sentence again.
+			#write
+			output_file = open(out_path + city_name + '_' + language + '_' + target_date + '.csv', 'wb')
+			writeToFile(lines, output_file)
+		output_file.close()
+
 	return
 
 
