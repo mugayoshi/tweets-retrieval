@@ -3,6 +3,7 @@ import json
 import sys
 from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
 import os
+import common_functions as cf
 def validate_area(country, searched):
 	if searched == 'US':
 		searched = 'United States'
@@ -69,9 +70,7 @@ def main():
 			file_name = "placeid_" + cityname + "_keyword_search.txt"
 
 	file_name = file_name.replace(' ', '')
-	if os.path.isdir(out_file_path) == False:
-		print 'city name is wrong'
-		quit()
+	cf.validate_directory(out_file_path)
 	output = open(out_file_path + file_name, 'w')
 
 	output.write('city name: ' + cityname + ', granularity: ' + granularity + ', latitude: ' + latitude + ', longtitude: ' + longtitude + "\n")

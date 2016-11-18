@@ -65,7 +65,7 @@ def write_place_info(places_info, place_name, output):
 
 def main():
 	twitter_api = cf.authentication_twitter(sys.argv[-1])
-	if len(sys.argv) > 1:
+	if len(sys.argv) >= 2:
 		cityname = sys.argv[1]
 		if len(sys.argv) > 2 and sys.argv[2].isalpha() == False:
 			wait_time = int(sys.argv[2])

@@ -88,7 +88,7 @@ def get_query(q, retweets=False, since="", until="", geocode="",):
 def main():
 	date = time.strftime("%d%b%Y%H%M")
 	argvs = sys.argv
-	if len(argvs) > 3:
+	if len(argvs) >= 3:
 		city_name = argvs[1]
 		lang = argvs[2]
 		file_name = city_name + "_" + lang + "_" + date + ".txt"
@@ -116,6 +116,7 @@ def main():
 		place_info = "\n------- " + place_name[0] + " at " + datetime.strftime(current_time, '%H:%M:%S on %d/%b/%Y') + " -------\n"
 		output.write(place_info)
 
+		print 'search ' + place_name[0] 
 		obtained_tweets = search(query, lang, output)#!!!! search function returns the number of the retrieved tweets
 		print str(obtained_tweets) + ' are retrieved in this loop from ' + place_name[0]
 		print '-------' + str(count_loop) + '/' +  str(len(place_id_dict)) + '-------'

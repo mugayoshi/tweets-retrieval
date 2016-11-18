@@ -26,7 +26,7 @@ def main():
 
 		if 't' in argvs[2]:#argvs[2] has to contain 't' to make 'non_city_name' true.
 			non_city_name = True
-			print 'non_city_nam is True'
+			print 'non_city_name is True'
 		else:
 			non_city_name = False
 	accuracy = 10000
@@ -56,9 +56,7 @@ def main():
 		out_file_path = "/home/muga/twitter/place_id_data/" + cityname + "/"
 	file_name = "placeid_" + cityname + "_keyword_search.txt"
 	file_name = file_name.replace(' ', '')
-	if os.path.isdir(out_file_path) == False:
-		print 'city name is wrong'
-		quit()
+	cf.validate_directory(out_file_path)
 	output = open(out_file_path + file_name, 'w')
 
 	output.write('keyword: ' + cityname + '\n')
