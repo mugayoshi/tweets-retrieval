@@ -197,39 +197,41 @@ def check_lang_file(filename, input_lang):
 		quit()
 	for w in filename.split('_'):
 		if input_lang == w:
-			print 'check_lang_file ' + input_lang + ' ' + w
+			#print 'check_lang_file ' + input_lang + ' ' + w
 			return True
 	return False
 
 def main():
 	if len(sys.argv) < 2:
-		print 'please input city. And if neccesary enter languageand  target date to specify the training data file'
+		print 'please input city. And if neccesary enter the way of classification, language and  target date to specify the training data file'
 		quit()
 
-	clf_strategy  = raw_input('One against One (0), One against The Rest (1) or Random Forest (2)  ----> ' )
-	if clf_strategy == str(0):
-		strategy = 'one_against_one'
-	elif clf_strategy == str(1):
-		strategy = 'one_against_the_rest'
-	elif clf_strategy == str(2):
-		strategy = 'random_forest'
+	if len(sys.argv) >= 3 and sys.argv[-1] == 'all':
+		strategy = 'all'
 	else:
-		print 'wrong input ' + clf_strategy
-		quit()
+		clf_strategy  = raw_input('One against One (0), One against The Rest (1) or Random Forest (2)  ----> ' )
+		if clf_strategy == str(0):
+			strategy = 'one_against_one'
+		elif clf_strategy == str(1):
+			strategy = 'one_against_the_rest'
+		elif clf_strategy == str(2):
+			strategy = 'random_forest'
+		else:
+			print 'wrong input ' + clf_strategy
+			quit()
+	strategies = ['one_against_one', 'one_against_the_rest', 'random_forest'] 
 	city_name = sys.argv[1]
-	if len(sys.argv) == 3:
+	if len(sys.argv) == 3 or (len(sys.argv) == 4 and sys.argv[3] == 'all'):
 		if sys.argv[2] in ['de', 'en', 'es', 'fr', 'pr']:
 			lang = sys.argv[2]
 			target_date = ''
-		elif len(sys.argv) == 3:
+		else:
 			target_date = sys.argv[2]
 			lang = ''
-		else:
-			print 'wrong input'
-			quit()
-	elif len(sys.argv) == 4:
+	elif len(sys.argv) >= 4:
 		lang = sys.argv[2]
 		target_date = sys.argv[3]
+		print 'target_date: ' + target_date
 	else:
 		lang = ''
 		target_date = ''
@@ -261,7 +263,10 @@ def main():
 	for k in train_data_dict:
 		print k, train_data_dict[k]
 
-	confirm = raw_input('It is going to process these files with %s. Is it okay ? (yes/no)' % strategy)
+	if strategy == 'all':
+		confirm = raw_input("it's going to do all classifications. Is it Okay ? (yes/no)")
+	else:
+		confirm = raw_input('It is going to process these files with %s. Is it okay ? (yes/no)' % strategy)
 	if not confirm.lower() in 'yes':
 		print 'cancel'
 		quit()
@@ -273,7 +278,11 @@ def main():
 		train_data = train_data_dict[language]
 		print 'train data: ' + train_data
 		print 'test on ' + test_data
-		classification(train_data, test_data, strategy) 
+		if strategy == 'all':
+			for s in strategies:
+				classification(train_data, test_data, s) 
+		else:
+			classification(train_data, test_data, strategy) 
 
 if __name__ == "__main__":
 	main()
