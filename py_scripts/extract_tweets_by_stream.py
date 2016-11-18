@@ -6,6 +6,10 @@ from urllib2 import URLError
 from httplib import BadStatusLine
 
 from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
+import common_functions as cf
+from datetime import datetime
+from datetime import timedelta
+
 def oauth_login():
 	auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET)
 
@@ -127,10 +131,12 @@ def obtainTweetsFromStream(twitter_api, q, lang, emotion, max_results):
 	#max_results = 200#can be modified
 	
 	date = time.strftime("%d%b%Y%H%M")
-	file_name = "tweets_" + date + "_" + lang + "_" + emotion + "_from_stream.txt"#this text file should be moved to another directory
-	out_file_path = "/home/muga/twitter/tweets_from_stream/"
+	file_name = date + "_" + lang + "_" + emotion + "_from_stream.txt"#this text file should be moved to another directory
+	out_file_path = "/home/muga/twitter/tweets_from_stream/training/"
+	cf.validate_directory(out_file_path, True)
 	output = open(out_file_path + file_name, 'w')
 	
+	start_time = datetime.now()
 	count = 0
 	for tweet in tweets:
 		if 'text' in tweet:
@@ -138,11 +144,15 @@ def obtainTweetsFromStream(twitter_api, q, lang, emotion, max_results):
 		else:
 			break#goes outside of this for loop
 		if validateTweet(txt, emotion):
-			s = json.dumps(tweet['text'], indent=1) + "\n"
-			output.write(s)
-			count = count + 1
+			s = json.dumps(tweet['text'], indent=1)
+			#print s + ', ' + tweet['created_at'].encode('utf-8')
+			output.write(s + ', ' + tweet['created_at'].encode('utf-8') + '\n')
+			count += 1
 			if count % 100 == 0:
-				print str(count) + ': ' + txt
+				print  txt + ' : ' + str(count) + ' out of ' + str(max_results)
+		if count > max_results:
+			cf.write_exec_time(start_time, output)
+			return
 
 	print 'goes into the while loop'
 	#while len(tweets) > 0 and count < max_results:
@@ -154,53 +164,45 @@ def obtainTweetsFromStream(twitter_api, q, lang, emotion, max_results):
 			else:
 				break #goes outside of this for loop
 			if validateTweet(txt, emotion):
-				s = json.dumps(tweet['text'], indent=1) + "\n"
-				output.write(s)
-				count = count + 1
+				s = json.dumps(tweet['text'], indent=1)
+				output.write(s + ', ' + tweet['created_at'].encode('utf-8') + '\n')
+				count += 1
 				if count % 100 == 0:
-					print str(count) + ': ' + txt
+					print  txt + ' : ' + str(count) + ' out of ' + str(max_results)
 	print 'goes out from the while loop'
 	output.close()
 	print 'Extracting ' + emotion + ' tweets of ' + lang + ' has done.'
+
+	cf.write_exec_time(start_time, output)
 	return
 	
 
 def main():
 
 	argvs = sys.argv
+	if len(argvs) <= 3:
+		print 'please input language, emotion and number of retrieved tweets. if necessary, also user name'
+		quit()
 	lang = argvs[1]
 	#q = ':), :D, :-), ;)'
 	languages = ['en', 'fr', 'es', 'de', 'pt']
 	if not lang in languages:
 		print 'this language is not valid'
 		quit()
-	
-	smiley = ':-), :-], :-3. :->, 8-), :-}, :o), :c), :^), :), :], :>,8), :}, =], =), :-))'
-	laugh = ":-D, 8-D, x-D, X-D, B^D, :D, 8D, xD, XD, =D, =3, :'-), :')"
-	kiss = ':-*, :*, :x'
-	wink = ';-), *-), ;-], ;^), :-, ;), *), ;], ;D'
-	heart = '<3'
-	yay = '\o/'
-
-	sad_angry = ':-(, :(, :c, :-c,  :<, :-<, :-[, :[, :-||, >:[, :{, :@, >:('
-	skeptical_annoyed = ':-/, :/, :-., >:\, >:/, :\, =/, =\, :L, :=L, :S'
-	crying = ":'-(, :'(, ('_'), (/_;), (T_T), (;_;), (;_;, (;_:), (;O;)"
-	troubled = '>.<, (>_<), (>_<)>, (-_-;)'
-	looking_down = '(..), (._.)'
-	indecision = ':-|, :|'
-
 	emotion = argvs[2]
 	if emotion == 'pos':
-		q = smiley + ', ' + laugh + ', ' + kiss + ', ' + wink + ', ' + heart + ', ' + yay
+		q = ':), :-), ^), :], 8), =), :-D, XD, :D, 8D, =D, ;-), ;), ;D, \o/'
 	elif emotion == 'neg':
-		q = sad_angry + ', ' + skeptical_annoyed + ', ' + crying + ', ' + troubled + ', ' + looking_down + ', ' + indecision
+		q = ":-(, :(, :c, :-/, :/, :S, :'(, :|"
 	else:
 		print 'emotion ' + emotion + ' is incorrect'
 		quit()
 	max_results = int(argvs[3])
-	twitter_api = oauth_login()
+	if len(argvs) == 5:
+		twitter_api = cf.authentication_twitter(argvs[4])
+	else:
+		twitter_api = oauth_login()
 	obtainTweetsFromStream(twitter_api, q, lang, emotion, max_results)
-	
 	
 if __name__ == "__main__":
 	main()
