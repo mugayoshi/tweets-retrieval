@@ -99,7 +99,16 @@ def authentication_twitter(user='muga'):
 
 def find_lang(filename):
 	languages = ['de', 'en', 'es', 'fr', 'pt']
-	for lang in languages:
-		if lang in filename:
-			return lang
+	for w in filename.split('_'):
+		for lang in languages:
+			if lang == w:
+				return lang
 	return ''
+
+def getEmoticonList(emotion):
+	if emotion == 'pos':
+		emoticons = [":)", ":-)", "^)", ":]", "8)", "=)", ":-D", "XD", ":D", "8D", "=D", ";-)", ";)", ";D", "\o/"]
+	elif emotion == 'neg':
+		emoticons = [":-(", ":(", ":c", ":-/", ":/", ":S", ":'(", ":|"]
+	
+	return emoticons
