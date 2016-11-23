@@ -25,7 +25,7 @@ def classification(filename_train, filename_test, strategy):
 	out_file_name = filename_test.split('/')[-1] + '_' + date + '.txt'
 	out_file_name = out_file_name.replace('.csv', '')
 	city_name = sys.argv[1]
-	out_file_path = "/home/muga/twitter/classification_result/" + strategy + "/" + city_name + '/'
+	out_file_path = "/home/muga/twitter/classification_result/original_training_data/" + city_name + "/" + strategy + '/'
 	cf.validate_directory(out_file_path, True)
 	lang = cf.find_lang(filename_test.split('/')[-1])
 	another_out_file_path = out_file_path + lang + '/'
@@ -34,6 +34,7 @@ def classification(filename_train, filename_test, strategy):
 	out = open(out_file_path + out_file_name, 'a')
 	start_time = datetime.now()
 
+	print '-' * 10 + strategy + ' ' + filename_test + '-' * 10
 	for score in scores:
 		out.write('\n' + '-'*50)
 		out.write(score)
@@ -62,7 +63,8 @@ def classification(filename_train, filename_test, strategy):
 	
 	cf.write_exec_time(start_time, out)
 	out.close()
-	print "classification of " + filename_train + " has done" 
+	print "classification of " + filename_test + " has done" 
+	print '-' * 30
 	return
 
 def showResult(score, y_pred, out):
@@ -255,6 +257,10 @@ def main():
 		elif 'es' in f and 'training_data' in f and f.endswith('.csv'):
 			language = cf.find_lang(f)
 			train_data_dict[language] = training_data_path + f
+
+	if len(test_data_list) == 0:
+		print 'Not Found'
+		quit()
 
 	print 'list of test data: '
 	print '\n'.join(test_data_list)
