@@ -103,6 +103,8 @@ def find_lang(filename):
 		for lang in languages:
 			if lang == w:
 				return lang
+	print filename.split('_')
+	print 'return none from find_lang'
 	return ''
 
 def getEmoticonList(emotion):
@@ -112,3 +114,40 @@ def getEmoticonList(emotion):
 		emoticons = [":-(", ":(", ":c", ":-/", ":/", ":S", ":'(", ":|"]
 	
 	return emoticons
+
+def extract_train_data(filename):#for training data
+	input_file = open(filename, 'rb')
+	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
+	labels = []
+	data = []
+	non_utf_8 = 0
+	header = next(csv_reader)
+	pos = 0
+	neg = 0
+	neu = 0
+	n_a = 0
+	for row in csv_reader:
+		try:
+			row[1].decode('utf-8', 'strict') #depends on file
+		except:
+			#print str(i) + ' ' + row[5] + ' contains non-utf-8 character'
+			non_utf_8 = non_utf_8 + 1
+			continue
+		if row[0] == "2": #neutral
+			labels.append(2)
+			neu += 1
+		elif row[0] == "1": #negative
+			labels.append(1)
+			neg += 1
+		elif row[0] == "0": #positive
+			labels.append(0)
+			pos += 1
+		elif row[0] == "3":
+			n_a += 1
+			continue
+		data.append(row[1]) 
+	#end of the for loop
+	print 'training data positive: ' + str(pos) + ' negative: ' + str(neg) + ' neutral: ' + str(neu) + ' n/a: ' + str(n_a)
+	return (labels, data)
+
+
