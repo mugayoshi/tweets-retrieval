@@ -24,7 +24,7 @@ def main():
 			print 'Please wait for ' + sys.argv[2] + ' minutes'
 			time.sleep(60*wait_time + 5)
 
-		if 't' in argvs[2]:#argvs[2] has to contain 't' to make 'non_city_name' true.
+		if 't' == argvs[2]:#argvs[2] has to contain 't' to make 'non_city_name' true.
 			non_city_name = True
 			print 'non_city_name is True'
 		else:

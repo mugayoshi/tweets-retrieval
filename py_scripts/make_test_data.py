@@ -84,6 +84,17 @@ def getEmoticonList(emotion):
 	
 	return ''
 
+def check_lang_file(filename, input_lang):
+	languages = ['de', 'en', 'es', 'fr', 'pt']
+	if not input_lang in languages:
+		print 'wront input ' + input_lang
+		quit()
+	for w in filename.split('_'):
+		if input_lang == w:
+			#print 'check_lang_file ' + input_lang + ' ' + w
+			return True
+	return False
+
 
 
 def main():
@@ -102,13 +113,17 @@ def main():
 	test_data_files = []
 	for f in os.listdir(test_data_path):
 		if lang in f and target_date in f:
-			test_data_files.append(f)
-			print f + ' is appended' 
+			if lang and check_lang_file(f, lang):
+				test_data_files.append(f)
+			elif not lang:
+				test_data_files.append(f)
 		
 	if len(test_data_files) == 0:
 		print 'Not Found'
 		quit()
 	
+	print 'test data list'
+	print '\n'.join(test_data_files)
 	confirm = raw_input('it is going to process these files. is it okay ? (yes/no) ' )
 	if not confirm.lower() in 'yes':
 		print 'abort this program'
@@ -135,7 +150,7 @@ def main():
 			output_file = open(out_path + city_name + '_' + language + '_' + target_date + '.csv', 'wb')
 			writeToFile(lines, output_file)
 		output_file.close()
-
+	print 'make_test_data.py is done'
 	return
 
 

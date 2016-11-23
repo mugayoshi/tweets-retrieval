@@ -16,7 +16,12 @@ def validate_area(country, searched):
 def main():
 	auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET)
 
-	twitter_api = twitter.Twitter(auth=auth)
+	#twitter_api = twitter.Twitter(auth=auth)
+	if len(sys.argv) >=2:
+		twitter_api = cf.authentication_twitter(sys.argv[-1])
+	else:
+		twitter_api = cf.authentication_twitter()
+	else:
 	print "parameter for geo search"
 	#print "query (city name etc)= ",
 	cityname = raw_input('query (city name etc)=' )
@@ -26,7 +31,7 @@ def main():
 	longtitude = raw_input('longtitude = ')
 	argvs = sys.argv
 	searched_country = ''
-	if len(argvs) == 2:
+	if len(argvs) >= 2:
 		searched_country = argvs[1]
 	
 	accuracy = 10000

@@ -16,12 +16,6 @@ def oauth_login():
 	twitter_api = twitter.Twitter(auth=auth)
 	return twitter_api
 
-def save_json(filename, data):
-	with io.open(jsonfilepath.format(filename), 'w', encoding='utf-8') as f:
-		f.write(unicode(json.dumps(data,ensure_ascii=False)))
-		
-	return
-
 def validateTweet(tweet, emotion):
 	words = tweet.split(' ')
 	opposite_emotion = []

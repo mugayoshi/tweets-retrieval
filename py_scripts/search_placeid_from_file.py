@@ -6,6 +6,7 @@ import time
 import common_functions as cf
 def getCoordinates(city_name, keyword):
 	data_path = '/home/muga/twitter/place_id_data/' + city_name + '/'
+	cf.validate_directory(data_path)
 	file_name = ''
 	#print 'city name: ' + city_name
 	for f in os.listdir(data_path):
@@ -38,7 +39,7 @@ def geo_search(twitter_api, place_name, latitude, longtitude):
 		print 'latitude: ' + latitude + ', longtitude ' + longtitude
 		quit()
 
-	print 'place name: %s, latitude:%.2f, longtitude:%.2f' % (place_name, latitude, longtitude)
+	print 'place name: %s, latitude:%.4f, longtitude:%.4f' % (place_name, latitude, longtitude)
 	accuracy = 10000
 	result = twitter_api.geo.search(lat=latitude, long=longtitude,accuracy=accuracy)
 	places_info = result['result']['places']
