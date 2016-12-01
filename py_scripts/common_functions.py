@@ -6,6 +6,7 @@ from tweepy import API
 from tweepy import OAuthHandler
 from settings_adam import OAUTH_TOKEN_adam, OAUTH_TOKEN_SECRET_adam, CONSUMER_KEY_adam, CONSUMER_KEY_SECRET_adam
 from settings_adam import OAUTH_TOKEN_berta, OAUTH_TOKEN_SECRET_berta, CONSUMER_KEY_berta, CONSUMER_KEY_SECRET_berta
+from settings_adam import OAUTH_TOKEN_yuki, OAUTH_TOKEN_SECRET_yuki, CONSUMER_KEY_yuki, CONSUMER_KEY_SECRET_yuki
 import twitter
 from credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_KEY_SECRET
 def validate_directory(path, create_dir=False):
@@ -14,7 +15,7 @@ def validate_directory(path, create_dir=False):
 		if create_dir:
 			os.makedirs(path)
 			print 'directory ' + path + ' is created'
-			time.sleep(5)#sleeps for 5 secs
+			time.sleep(1)#sleeps for 5 secs
 		else:
 			print 'abort'
 			quit()
@@ -76,6 +77,10 @@ def authentication_tweepy(user='muga'):
 	elif user == 'berta':
 		auth = OAuthHandler(CONSUMER_KEY_berta, CONSUMER_KEY_SECRET_berta)
 		auth.set_access_token(OAUTH_TOKEN_berta, OAUTH_TOKEN_SECRET_berta)
+	elif user == 'yuki':
+		auth = OAuthHandler(CONSUMER_KEY_yuki, CONSUMER_KEY_SECRET_yuki)
+		auth.set_access_token(OAUTH_TOKEN_yuki, OAUTH_TOKEN_SECRET_yuki)
+
 	else:
 		print 'user ' + user + ' is wrong'
 		quit()
@@ -90,6 +95,9 @@ def authentication_twitter(user='muga'):
 		auth = twitter.oauth.OAuth(OAUTH_TOKEN_adam, OAUTH_TOKEN_SECRET_adam, CONSUMER_KEY_adam, CONSUMER_KEY_SECRET_adam)
 	elif user == 'berta':
 		auth = twitter.oauth.OAuth(OAUTH_TOKEN_berta, OAUTH_TOKEN_SECRET_berta, CONSUMER_KEY_berta, CONSUMER_KEY_SECRET_berta)
+	elif user == 'yuki':
+		auth = twitter.oauth.OAuth(OAUTH_TOKEN_yuki, OAUTH_TOKEN_SECRET_yuki, CONSUMER_KEY_yuki, CONSUMER_KEY_SECRET_yuki)
+
 	else:
 		print 'user ' + user + ' is wrong'
 		quit()
