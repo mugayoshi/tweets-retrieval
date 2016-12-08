@@ -10,10 +10,11 @@ from tweepy import Cursor
 
 import time
 import os
-import common_functions as cf
+import common_functions_twitter as cf_tw
+import common_functions_general as cf_gen
 
 def search(query, lang, output, max_count=10000):#max count is set to 10000 in version of Adam
-	api = cf.authentication_tweepy(sys.argv[-1])
+	api = cf_tw.authentication_tweepy(sys.argv[-1])
 
 	retrieved_tweets = 0
 	six_days_ago = (datetime.now() - timedelta(days=6)).date()#due to the time difference, it is set to be 6 days ago.
@@ -98,7 +99,7 @@ def main():
 		#file_name = "tweets-" + date + "-" + city_name + ".txt"
 	file_name = file_name.replace(' ', '')
 	out_file_path = '/home/muga/twitter/tweets_from_searchAPI/tweepy/' + city_name + '/'
-	cf.validate_directory(out_file_path)
+	cf_gen.validate_directory(out_file_path)
 
 	output = open(out_file_path + file_name, 'w')
 
@@ -125,7 +126,7 @@ def main():
 #the end of the for loop for each place
 
 	print str(retrieved_tweets) + ' are retrieved ' + argvs[0] + ' is done'
-	cf.write_exec_time(start_time, output)
+	cf_gen.write_exec_time(start_time, output)
 	output.close()
 if __name__ == '__main__':
 	main()

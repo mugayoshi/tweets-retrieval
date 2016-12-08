@@ -2,7 +2,7 @@ import re
 import os
 import sys
 import time
-import common_functions as cf
+import common_functions_general as cf
 def extractTweetAndDate(line):
 	l = line.split(',')
 	if not l or '-------' in l[0] or len(l) == 1:
@@ -129,7 +129,7 @@ def main():
 		print 'abort this program'
 		quit()
 
-	out_path = '/home/muga/twitter/test_data/retrieved_data/' + city_name + '/'
+	out_path = '/home/muga/twitter/test_data/retrieved_data/' + city_name + '/not_processed/'
 	cf.validate_directory(out_path, True)
 	if lang:
 		output_file = open(out_path + city_name + '_' + lang + '_' + target_date + '.csv', 'wb')
