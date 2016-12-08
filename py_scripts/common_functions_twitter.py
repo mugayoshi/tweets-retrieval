@@ -158,4 +158,18 @@ def extract_train_data(filename):#for training data
 	print 'training data positive: ' + str(pos) + ' negative: ' + str(neg) + ' neutral: ' + str(neu) + ' n/a: ' + str(n_a)
 	return (labels, data)
 
-
+def skip_parameter(score, strategy, lang):
+	if lang == 'es':
+		if score == 'accuracy':
+			return False
+		else:
+			print 'skip this parameter ' + score 
+			return True
+	if strategy == 'one_against_one' or strategy == 'one_against_the_rest':
+		if score == 'accuracy':
+			return False
+		else:
+			print 'skip this parameter ' + score 
+			return True
+	else:
+		return False

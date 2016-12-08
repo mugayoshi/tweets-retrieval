@@ -36,6 +36,8 @@ def classification(filename_train, filename_test, strategy):
 
 	print '-' * 10 + strategy + ' ' + filename_test + '-' * 10
 	for score in scores:
+		if cf.skip_parameter(score, strategy, lang):
+			continue
 		out.write('\n' + '-'*50)
 		out.write(score)
 		out.write('-'*50)

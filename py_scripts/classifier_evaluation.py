@@ -21,9 +21,9 @@ def classification(filename, strategy):
 	scores = ['accuracy', 'precision_micro', 'recall_weighted', 'f1_micro']
 
 	date = time.strftime('%d%b%Y%H%M')
-	out_file_name = filename.split('/')[-1].split('.')[0] + '_' + date+ '.txt'
-	out_file_path = "/home/muga/twitter/classification_result/classifier_evaluation/" + strategy + "/"
-	cf.validate_directory(out_file_path)
+	out_file_name = filename.split('/')[-1].split('.')[0] + '_' + date+ '_' + strategy + '.txt'
+	out_file_path = "/home/muga/twitter/classification_result/classifier_evaluation/training_data_emoji/"
+	cf.validate_directory(out_file_path, True)
 
 	out = open(out_file_path + out_file_name, 'a')
 	start_time = datetime.now()
@@ -80,21 +80,12 @@ def extractTweetAndLabel(filename):#from spanish data version
 
 def getFeatureVecAndLabel(filename):#for both training and test data
 	#generate a matrix of token counts
-	lang = sys.argv[1]
-	if lang == 'es':
-		labels, tweets = extractSpanishData(filename)
-	else:
-		labels, tweets = extractTweetAndLabelForTrainData(filename)
+	labels, tweets = cf.extract_train_data(filename)
 	count_vectorizer = CountVectorizer()
 	feature_vectors = count_vectorizer.fit_transform(tweets)
-
-	"""
-	labels, tweets = extractTweetAndLabel(filename)
-	count_vectorizer = CountVectorizer()
-	feature_vectors = count_vectorizer.fit_transform(tweets)
-	"""
 
 	return (labels, feature_vectors)
+
 def extractTweetAndLabelForTrainData(filename):
 	input_file = open(filename, 'rb')
 	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
@@ -180,10 +171,11 @@ def main():
 		print 'wrong input ' + clf_strategy
 		quit()
 	lang = sys.argv[1]
-	input_data_path = '/home/muga/twitter/original_trainingdata/'
+	#input_data_path = '/home/muga/twitter/original_trainingdata/'
+	input_data_path = '/home/muga/twitter/new_trainingdata/'
 	evaluated_data = ''
 	for f in os.listdir(input_data_path):
-		if f.endswith('.csv') and 'merge' in f and lang in f:
+		if f.endswith('.csv') and 'new' in f and lang in f:
 			evaluated_data = input_data_path + f
 			break
 		if lang == 'es' and 'training_data' in f and lang in f:
@@ -192,10 +184,10 @@ def main():
 	print 'train data: ' + evaluated_data
 	
 	confirm = raw_input('it is going to process this file with %s. is it okay ? (yes/no)' % strategy)
-	if confirm == 'no' or confirm == 'No':
+	if not confirm.lower() in 'yes':
 		print 'cancel'
 		quit()
-	
+
 	classification(evaluated_data, strategy) 
 
 if __name__ == "__main__":

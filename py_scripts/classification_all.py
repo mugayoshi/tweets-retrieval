@@ -9,7 +9,8 @@ from sklearn.metrics import precision_score, recall_score, f1_score
 import os
 import sys
 import time
-import common_functions as cf
+#import common_functions_twitter as cft
+import common_functions_general as cfg
 
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC, LinearSVC
@@ -26,16 +27,18 @@ def classification(filename_train, filename_test, strategy):
 	out_file_name = out_file_name.replace('.csv', '')
 	city_name = sys.argv[1]
 	out_file_path = "/home/muga/twitter/classification_result/original_training_data/" + city_name + "/" + strategy + '/'
-	cf.validate_directory(out_file_path, True)
-	lang = cf.find_lang(filename_test.split('/')[-1])
+	cfg.validate_directory(out_file_path, True)
+	lang = cfg.find_lang(filename_test.split('/')[-1])
 	another_out_file_path = out_file_path + lang + '/'
-	cf.validate_directory(another_out_file_path, True)
+	cfg.validate_directory(another_out_file_path, True)
 
 	out = open(out_file_path + out_file_name, 'a')
 	start_time = datetime.now()
 
 	print '-' * 10 + strategy + ' ' + filename_test + '-' * 10
 	for score in scores:
+		if cfg.skip_parameter(score, strategy, lang):
+			continue
 		out.write('\n' + '-'*50)
 		out.write(score)
 		out.write('-'*50)
@@ -52,8 +55,12 @@ def classification(filename_train, filename_test, strategy):
 		else:
 			print strategy + ' is wrong'
 			quit()
+		print 'before fit()'
+		start_fit = datetime.now()
 		clf.fit(feat_vec_train, label_train)
+		cfg.print_exec_time(start_fit)
 		print clf.best_estimator_
+
 
 		y_pred = clf.predict(feat_vec_test)
 
@@ -61,7 +68,7 @@ def classification(filename_train, filename_test, strategy):
 		writeResult(score, y_pred, tweets, out_file_name, another_out_file_path)
 		print 'loop for ' + score + ' has done\n' 
 	
-	cf.write_exec_time(start_time, out)
+	cfg.write_exec_time(start_time, out)
 	out.close()
 	print "classification of " + filename_test + " has done" 
 	print '-' * 30
@@ -97,7 +104,7 @@ def writeResult(score, y_pred, tweets, filename_test, output_path):
 	out = open(output_path + out_file_name, 'a')
 
 	for label, tweet in itertools.izip(y_pred, tweets):
-		l = cf.get_emotion_label(label)
+		l = cfg.get_emotion_label(label)
 		out.write(l + ', ' + tweet + '\n')
 	out.close()
 
@@ -176,12 +183,12 @@ def extractSpanishData(filename):#for training data
 
 def getFeatureVecsAndLabel(file_train_data, file_test_data):#for both training and test data
 	#generate a matrix of token counts
-	lang = cf.find_lang(file_test_data.split('/')[-1])
+	lang = cfg.find_lang(file_test_data.split('/')[-1])
 	if lang == 'es':
 		labels_train, tweets_train = extractSpanishData(file_train_data)
 	else:
 		labels_train, tweets_train = extractTweetAndLabelForTrainData(file_train_data)
-	tweets_test = cf.extract_tweet_from_test_data(file_test_data)
+	tweets_test = cfg.extract_tweet_from_test_data(file_test_data)
 
 	count_vectorizer_train = CountVectorizer()
 	feat_vec_train = count_vectorizer_train.fit_transform(tweets_train)
@@ -238,11 +245,13 @@ def main():
 		lang = ''
 		target_date = ''
 	test_data_path = '/home/muga/twitter/test_data/retrieved_data/' + city_name + '/'
-	cf.validate_directory(test_data_path)
+	cfg.validate_directory(test_data_path)
 	training_data_path = '/home/muga/twitter/original_trainingdata/'
 	train_data_dict = {}
 	test_data_list = []#tweet data obtained from search API
 	for f in os.listdir(test_data_path):
+		if not 'uniq' in f:#test file should not contain duplicate lines
+			continue
 		if f.endswith('.csv') and f.startswith('') and target_date in f and lang in f:
 			if lang and check_lang_file(f, lang):
 					test_data_list.append(test_data_path + f)
@@ -250,12 +259,12 @@ def main():
 				test_data_list.append(test_data_path + f)
 
 	for f in os.listdir(training_data_path):
-		if f.endswith('.csv') and 'merge' in f:
-			language = cf.find_lang(f)
+		if f.endswith('.csv') and 'merge' in f and 'uniq' in f:
+			language = cfg.find_lang(f)
 			train_data_dict[language] = training_data_path + f
 			
 		elif 'es' in f and 'training_data' in f and f.endswith('.csv'):
-			language = cf.find_lang(f)
+			language = cfg.find_lang(f)
 			train_data_dict[language] = training_data_path + f
 
 	if len(test_data_list) == 0:
@@ -280,7 +289,7 @@ def main():
 		if lang:
 			language = lang
 		else:
-			language = cf.find_lang(test_data.split('/')[-1])
+			language = cfg.find_lang(test_data.split('/')[-1])
 		train_data = train_data_dict[language]
 		print 'train data: ' + train_data
 		print 'test on ' + test_data
