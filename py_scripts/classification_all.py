@@ -26,7 +26,11 @@ def classification(filename_train, filename_test, strategy):
 	out_file_name = filename_test.split('/')[-1] + '_' + date + '.txt'
 	out_file_name = out_file_name.replace('.csv', '')
 	city_name = sys.argv[1]
-	out_file_path = "/home/muga/twitter/classification_result/original_training_data/" + city_name + "/" + strategy + '/'
+
+	if 'emoji_replaced' in sys.argv:
+		out_file_path = "/home/muga/twitter/classification_result/original_training_data/emoji_replaced/" + city_name + "/" + strategy + '/'
+	else:
+		out_file_path = "/home/muga/twitter/classification_result/original_training_data/" + city_name + "/" + strategy + '/'
 	cfg.validate_directory(out_file_path, True)
 	lang = cfg.find_lang(filename_test.split('/')[-1])
 	another_out_file_path = out_file_path + lang + '/'
@@ -109,85 +113,11 @@ def writeResult(score, y_pred, tweets, filename_test, output_path):
 	out.close()
 
 
-def extractTweetAndLabelForTrainData(filename):
-	input_file = open(filename, 'rb')
-	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
-	labels = []
-	data = []
-	non_utf_8 = 0
-	header = next(csv_reader)
-	pos = 0
-	neg = 0
-	neu = 0
-	n_a = 0
-	for row in csv_reader:
-		try:
-			row[4].decode('utf-8', 'strict') #depends on file
-		except:
-			#print str(i) + ' ' + row[5] + ' contains non-utf-8 character'
-			non_utf_8 = non_utf_8 + 1
-			continue
-		if row[1] == "2": #neutral
-			labels.append(2)
-			neu+= 1
-		elif row[1] == "1": #negative
-			labels.append(1)
-			neg += 1
-		elif row[1] == "0": #positive
-			labels.append(0)
-			pos += 1
-		elif row[1] == "3":
-			n_a += 1
-			continue
-		data.append(row[4]) 
-	#end of the for loop
-	print 'training data positive: ' + str(pos) + ' negative: ' + str(neg) + ' neutral: ' + str(neu) + ' n/a: ' + str(n_a)
-	return (labels, data)
-
-def extractSpanishData(filename):#for training data
-	input_file = open(filename, 'rb')
-	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
-	labels = []
-	data = []
-	non_utf_8 = 0
-	header = next(csv_reader)
-	pos = 0
-	neg = 0
-	neu = 0
-	n_a = 0
-	for row in csv_reader:
-		try:
-			row[1].decode('utf-8', 'strict') #depends on file
-		except:
-			#print str(i) + ' ' + row[5] + ' contains non-utf-8 character'
-			non_utf_8 = non_utf_8 + 1
-			continue
-		if row[0] == "2": #neutral
-			labels.append(2)
-			neu += 1
-		elif row[0] == "1": #negative
-			labels.append(1)
-			neg += 1
-		elif row[0] == "0": #positive
-			labels.append(0)
-			pos += 1
-		elif row[0] == "3":
-			n_a += 1
-			continue
-		data.append(row[1]) 
-	#end of the for loop
-	print 'training data positive: ' + str(pos) + ' negative: ' + str(neg) + ' neutral: ' + str(neu) + ' n/a: ' + str(n_a)
-	return (labels, data)
-
-
-
 def getFeatureVecsAndLabel(file_train_data, file_test_data):#for both training and test data
 	#generate a matrix of token counts
+	labels_train, tweets_train = cfg.extract_train_data(file_train_data)
 	lang = cfg.find_lang(file_test_data.split('/')[-1])
-	if lang == 'es':
-		labels_train, tweets_train = extractSpanishData(file_train_data)
-	else:
-		labels_train, tweets_train = extractTweetAndLabelForTrainData(file_train_data)
+	
 	tweets_test = cfg.extract_tweet_from_test_data(file_test_data)
 
 	count_vectorizer_train = CountVectorizer()
@@ -215,7 +145,7 @@ def main():
 		print 'please input city. And if neccesary enter the way of classification, language and  target date to specify the training data file'
 		quit()
 
-	if len(sys.argv) >= 3 and sys.argv[-1] == 'all':
+	if len(sys.argv) >= 3 and 'all' in sys.argv:
 		strategy = 'all'
 	else:
 		clf_strategy  = raw_input('One against One (0), One against The Rest (1) or Random Forest (2)  ----> ' )
@@ -244,7 +174,12 @@ def main():
 	else:
 		lang = ''
 		target_date = ''
-	test_data_path = '/home/muga/twitter/test_data/retrieved_data/' + city_name + '/'
+	
+	if 'emoji_replaced' in sys.argv:
+		test_data_path = '/home/muga/twitter/test_data/emoji_replaced/' + city_name + '/'
+	else:
+		test_data_path = '/home/muga/twitter/test_data/retrieved_data/' + city_name + '/'
+
 	cfg.validate_directory(test_data_path)
 	training_data_path = '/home/muga/twitter/original_trainingdata/'
 	train_data_dict = {}
@@ -252,9 +187,9 @@ def main():
 	for f in os.listdir(test_data_path):
 		if not 'uniq' in f:#test file should not contain duplicate lines
 			continue
-		if f.endswith('.csv') and f.startswith('') and target_date in f and lang in f:
+		if f.endswith('.csv') and target_date in f and lang in f:
 			if lang and check_lang_file(f, lang):
-					test_data_list.append(test_data_path + f)
+				test_data_list.append(test_data_path + f)
 			elif not lang:
 				test_data_list.append(test_data_path + f)
 

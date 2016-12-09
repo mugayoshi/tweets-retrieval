@@ -9,7 +9,7 @@ from sklearn.metrics import precision_score, recall_score, f1_score
 import os
 import sys
 import time
-import common_functions_general as cf
+import common_functions_general as cfg
 
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC, LinearSVC
@@ -25,18 +25,22 @@ def classification(filename_train, filename_test, strategy):
 	out_file_name = filename_test.split('/')[-1] + '_' + date + '_' + strategy +'.txt'
 	out_file_name = out_file_name.replace('.csv', '')
 	city_name = sys.argv[1]
-	out_file_path = "/home2/muga/classification_result/" + city_name + '/'
-	cf.validate_directory(out_file_path, True)
-	lang = cf.find_lang(filename_test.split('/')[-1])
+	if 'emoji_replaced' in sys.argv:
+		out_file_path = "/home2/muga/classification_result/emoji_replaced/" + city_name + "/" + strategy + '/'
+	else:
+		out_file_path = "/home2/muga/classification_result/" + city_name + "/" + strategy + '/'
+	#out_file_path = "/home2/muga/classification_result/" + city_name + '/'
+	cfg.validate_directory(out_file_path, True)
+	lang = cfg.find_lang(filename_test.split('/')[-1])
 	another_out_file_path = out_file_path + lang + '/'
-	cf.validate_directory(another_out_file_path, True)
+	cfg.validate_directory(another_out_file_path, True)
 
 	out = open(out_file_path + out_file_name, 'a')
 	start_time = datetime.now()
 
 	print '-' * 10 + strategy + ' ' + filename_test + '-' * 10
 	for score in scores:
-		if cf.skip_parameter(score, strategy, lang):
+		if cfg.skip_parameter(score, strategy, lang):
 			continue
 		out.write('\n' + '-'*50)
 		out.write(score)
@@ -63,7 +67,7 @@ def classification(filename_train, filename_test, strategy):
 		writeResult(score, y_pred, tweets, out_file_name, another_out_file_path)
 		print 'loop for ' + score + ' has done\n' 
 	
-	cf.write_exec_time(start_time, out)
+	cfg.write_exec_time(start_time, out)
 	out.close()
 	print "classification of " + filename_test + " has done" 
 	print '-' * 30
@@ -99,91 +103,19 @@ def writeResult(score, y_pred, tweets, filename_test, output_path):
 	out = open(output_path + out_file_name, 'a')
 
 	for label, tweet in itertools.izip(y_pred, tweets):
-		l = cf.get_emotion_label(label)
+		l = cfg.get_emotion_label(label)
 		out.write(l + ', ' + tweet + '\n')
 	out.close()
 
-
-def extractTweetAndLabelForTrainData(filename):
-	input_file = open(filename, 'rb')
-	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
-	labels = []
-	data = []
-	non_utf_8 = 0
-	header = next(csv_reader)
-	pos = 0
-	neg = 0
-	neu = 0
-	n_a = 0
-	for row in csv_reader:
-		try:
-			row[4].decode('utf-8', 'strict') #depends on file
-		except:
-			#print str(i) + ' ' + row[5] + ' contains non-utf-8 character'
-			non_utf_8 = non_utf_8 + 1
-			continue
-		if row[1] == "2": #neutral
-			labels.append(2)
-			neu+= 1
-		elif row[1] == "1": #negative
-			labels.append(1)
-			neg += 1
-		elif row[1] == "0": #positive
-			labels.append(0)
-			pos += 1
-		elif row[1] == "3":
-			n_a += 1
-			continue
-		data.append(row[4]) 
-	#end of the for loop
-	print 'training data positive: ' + str(pos) + ' negative: ' + str(neg) + ' neutral: ' + str(neu) + ' n/a: ' + str(n_a)
-	return (labels, data)
-
-def extractSpanishData(filename):#for training data
-	input_file = open(filename, 'rb')
-	csv_reader = csv.reader(input_file, delimiter=",", quotechar='"')
-	labels = []
-	data = []
-	non_utf_8 = 0
-	header = next(csv_reader)
-	pos = 0
-	neg = 0
-	neu = 0
-	n_a = 0
-	for row in csv_reader:
-		try:
-			row[1].decode('utf-8', 'strict') #depends on file
-		except:
-			#print str(i) + ' ' + row[5] + ' contains non-utf-8 character'
-			non_utf_8 = non_utf_8 + 1
-			continue
-		if row[0] == "2": #neutral
-			labels.append(2)
-			neu += 1
-		elif row[0] == "1": #negative
-			labels.append(1)
-			neg += 1
-		elif row[0] == "0": #positive
-			labels.append(0)
-			pos += 1
-		elif row[0] == "3":
-			n_a += 1
-			continue
-		data.append(row[1]) 
-	#end of the for loop
-	print 'training data positive: ' + str(pos) + ' negative: ' + str(neg) + ' neutral: ' + str(neu) + ' n/a: ' + str(n_a)
-	return (labels, data)
 
 
 
 def getFeatureVecsAndLabel(file_train_data, file_test_data):#for both training and test data
 	#generate a matrix of token counts
-	lang = cf.find_lang(file_test_data.split('/')[-1])
-	if lang == 'es':
-		labels_train, tweets_train = extractSpanishData(file_train_data)
-	else:
-		labels_train, tweets_train = extractTweetAndLabelForTrainData(file_train_data)
-	tweets_test = cf.extract_tweet_from_test_data(file_test_data)
+	lang = cfg.find_lang(file_test_data.split('/')[-1])
+	labels_train, tweets_train = cfg.extract_train_data(file_train_data)
+	
+	tweets_test = cfg.extract_tweet_from_test_data(file_test_data)
 
 	count_vectorizer_train = CountVectorizer()
 	feat_vec_train = count_vectorizer_train.fit_transform(tweets_train)
@@ -210,7 +142,7 @@ def main():
 		print 'please input city. And if neccesary enter the way of classification, language and  target date to specify the training data file'
 		quit()
 
-	if len(sys.argv) >= 3 and sys.argv[-1] == 'all':
+	if len(sys.argv) >= 3 and 'all' in sys.argv:
 		strategy = 'all'
 	else:
 		clf_strategy  = raw_input('One against One (0), One against The Rest (1) or Random Forest (2)  ----> ' )
@@ -239,8 +171,12 @@ def main():
 	else:
 		lang = ''
 		target_date = ''
-	test_data_path = '/home2/muga/test_data/' + city_name + '/'
-	cf.validate_directory(test_data_path)
+	if 'emoji_replaced' in sys.argv:
+		test_data_path = '/home2/muga/test_data/emoji_replaced/' + city_name + '/'
+	else:
+		test_data_path = '/home2/muga/test_data/' + city_name + '/'
+	#test_data_path = '/home2/muga/test_data/' + city_name + '/'
+	cfg.validate_directory(test_data_path)
 	training_data_path = '/home2/muga/training_data/'
 	train_data_dict = {}
 	test_data_list = []#tweet data obtained from search API
@@ -254,12 +190,12 @@ def main():
 				test_data_list.append(test_data_path + f)
 
 	for f in os.listdir(training_data_path):
-		if f.endswith('.csv') and 'merge' in f:
-			language = cf.find_lang(f)
+		if f.endswith('.csv') and 'merge' in f and 'uniq' in f:
+			language = cfg.find_lang(f)
 			train_data_dict[language] = training_data_path + f
 			
 		elif 'es' in f and 'training_data' in f and f.endswith('.csv'):
-			language = cf.find_lang(f)
+			language = cfg.find_lang(f)
 			train_data_dict[language] = training_data_path + f
 
 	if len(test_data_list) == 0:
@@ -284,7 +220,7 @@ def main():
 		if lang:
 			language = lang
 		else:
-			language = cf.find_lang(test_data.split('/')[-1])
+			language = cfg.find_lang(test_data.split('/')[-1])
 		train_data = train_data_dict[language]
 		print 'train data: ' + train_data
 		print 'test on ' + test_data
