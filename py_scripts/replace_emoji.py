@@ -5,30 +5,36 @@ import os
 import sys
 def make_dictionary(lang='en'):
 
-	dict_file = '/home/muga/twitter/emoji_dict_all_languages.csv'
+	dict_file = '/home/muga/twitter/emoji_dict_all.csv'
 	
 	input_file = open(dict_file, 'rU')
 	csv_reader = csv.reader(input_file, delimiter=",")
-	dict = {}
+	emoji_descp_dict = {}
 	#header = next(csv_reader)
 	for row in csv_reader:
 		#print row[0], row[1]
 		#print ', '.join(row)
 		#data.append(row[0]) #depends on file
+		if not ':' in row[0]:
+			continue
 		if lang == 'en':
-			dict[row[0]] = row[1]
+			emoji_descp_dict[row[0]] = row[1]
 		elif lang == 'fr':
-			dict[row[0]] = row[2]
+			emoji_descp_dict[row[0]] = row[2]
 		elif lang == 'de':
-			dict[row[0]] = row[3]
+			emoji_descp_dict[row[0]] = row[3]
 		elif lang == 'es':
-			dict[row[0]] = row[4]
+			emoji_descp_dict[row[0]] = row[4]
 		elif lang == 'pt':
-			dict[row[0]] = row[5]
+			emoji_descp_dict[row[0]] = row[5]
 		
-	
+	"""
+	for k in emoji_descp_dict:
+		print k, emoji_descp_dict[k]
+	quit()
+	"""
 
-	return dict
+	return emoji_descp_dict
 
 def replace_emoji_with_str(emoji_descp_dict, test_data, outfile):
 	emoji_dict = emoji.EMOJI_UNICODE
@@ -48,12 +54,14 @@ def replace_emoji_with_str(emoji_descp_dict, test_data, outfile):
 				if emoji_code in line.decode('utf-8'):
 					replaced_with = ' { ' + emoji_descp + ' } ' 
 					output_line = output_line.replace(emoji_code.encode('utf-8'), replaced_with)
-					print 'replaced ' + key.encode('utf-8') + ' ' + emoji_code.encode('utf-8') + ' ' + emoji_descp
+					#print 'replaced ' + key.encode('utf-8') + ' ' + emoji_code.encode('utf-8') + ' ' + emoji_descp
 					changed = True
 			except:
 				continue
+		"""
 		if changed:
 			print line + ' ---> ' + output_line
+		"""
 		outfile.write(output_line)
 	return
 def main():
@@ -79,6 +87,7 @@ def main():
 		replace_emoji_with_str(emoji_descp_dict, input_file, output_file)
 		input_file.close()
 		output_file.close()
+		print 'Replacing ' + f + ' has changed'
 
 	return
 
