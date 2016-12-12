@@ -144,6 +144,8 @@ def main():
 
 	if len(sys.argv) >= 3 and 'all' in sys.argv:
 		strategy = 'all'
+	elif sys.argv[-1] == 'one_against_one' or sys.argv[-1] == 'one_against_the_rest' or sys.argv[-1] == 'random_forest':
+		strategy = sys.argv[-1]
 	else:
 		clf_strategy  = raw_input('One against One (0), One against The Rest (1) or Random Forest (2)  ----> ' )
 		if clf_strategy == str(0):
@@ -157,14 +159,14 @@ def main():
 			quit()
 	strategies = ['one_against_one', 'one_against_the_rest', 'random_forest'] 
 	city_name = sys.argv[1]
-	if len(sys.argv) == 3 or (len(sys.argv) == 4 and sys.argv[3] == 'all'):
+	if len(sys.argv) >= 4 and 'all' in sys.argv:
 		if sys.argv[2] in ['de', 'en', 'es', 'fr', 'pr']:
 			lang = sys.argv[2]
-			target_date = ''
+			target_date = sys.argv[3]
 		else:
-			target_date = sys.argv[2]
 			lang = ''
-	elif len(sys.argv) >= 4:
+			target_date = sys.argv[2]
+	elif len(sys.argv) > 3:
 		lang = sys.argv[2]
 		target_date = sys.argv[3]
 		print 'target_date: ' + target_date
@@ -182,6 +184,8 @@ def main():
 	test_data_list = []#tweet data obtained from search API
 	for f in os.listdir(test_data_path):
 		if not 'uniq' in f:#test file should not contain duplicate lines
+			continue
+		if 'emoji_replaced' in sys.argv and not 'emoji_replaced' in f:
 			continue
 		if f.endswith('.csv') and f.startswith('') and target_date in f and lang in f:
 			if lang and check_lang_file(f, lang):
@@ -211,11 +215,17 @@ def main():
 
 	if strategy == 'all':
 		confirm = raw_input("it's going to do all classifications. Is it Okay ? (yes/no)")
+	elif sys.argv[-1] == 'one_against_one' or sys.argv[-1] == 'one_against_the_rest' or sys.argv[-1] == 'random_forest':
+		confirm = 'yes'
 	else:
 		confirm = raw_input('It is going to process these files with %s. Is it okay ? (yes/no)' % strategy)
 	if not confirm.lower() in 'yes':
 		print 'cancel'
 		quit()
+	"""
+	print 'strategy = ' + strategy + ', '.join(sys.argv)
+	quit()
+	"""
 	for test_data in test_data_list:
 		if lang:
 			language = lang
