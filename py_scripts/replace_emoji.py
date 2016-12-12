@@ -64,26 +64,51 @@ def replace_emoji_with_str(emoji_descp_dict, test_data, outfile):
 		"""
 		outfile.write(output_line)
 	return
+
+def obtain_language(lang):
+	if lang == 'en':
+		return 'ENGLISH'
+	elif lang == 'fr':
+		return 'FRENCH'
+	elif lang == 'de':
+		return 'GERMAN'
+	elif lang == 'es':
+		return 'SPANISH'
+	elif lang == 'pt':
+		return 'PORTUGESE'
+	else:
+		return ''
+
 def main():
 	if len(sys.argv) < 3:
 		print 'must input city name and language if necessary.'
 		quit()
 	city = sys.argv[1]
 	lang = sys.argv[2]
+	if len(sys.argv) >= 4:
+		target_date = sys.argv[3]
+	else:
+		target_date = ''
 	emoji_descp_dict = make_dictionary(lang)
 	test_data_path = '/home/muga/twitter/test_data/retrieved_data/' + city + '/'
 	test_data_list = []
 	for f in os.listdir(test_data_path):
-		if lang in f and city in f:
+		lang_in_file = '_' + lang + '_'
+		if lang_in_file in f and city in f and target_date in f:
 			test_data_list.append(f)
+			print 'found ' + f
+	if len(test_data_list) == 0:
+		print 'Not Found'
+		quit()
+	print '\nTarget Language is ' + obtain_language(lang) + '\n'
 	#test_data = test_data_path + 'London_en_20Nov_uniq.csv'
 	out_path = '/home/muga/twitter/test_data/emoji_replaced/' + city + '/'
 	cfg.validate_directory(out_path, True)
 	for f in test_data_list:
-		out_filename = f
-		print out_filename
+		out_filename = 'emoji_replaced_' + f
+		print 'starts replacing ' + f
 		input_file = open(test_data_path + f, 'r')
-		output_file = open(out_path + f, 'w')
+		output_file = open(out_path + out_filename, 'w')
 		replace_emoji_with_str(emoji_descp_dict, input_file, output_file)
 		input_file.close()
 		output_file.close()
